@@ -1,0 +1,85 @@
+{
+  "$schema": "../specification/schemas/global-profile.json",
+  "$comment": "Example profile for a person with dual Russian-Ukrainian citizenship",
+  "version": "1.0.0",
+  
+  "global_unique_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  
+  "international_status": {
+    "verification_level": "QUALIFIED",
+    "data_protection_level": ["GDPR"],
+    "sanctions_check": false,
+    "cross_border_consent": {
+      "granted": true,
+      "timestamp": "2024-01-22T10:00:00Z",
+      "jurisdictions": ["RU", "UA", "KZ", "BY"],
+      "purpose": "Family relations and business activities"
+    }
+  },
+  
+  "international_person_identifier": {
+    "issuing_authority": "UN",
+    "identifier_type": "OTHER",
+    "identifier_number": "ENC[AES256_GCM](UNREF-2024-001)",
+    "verification_status": "VERIFIED"
+  },
+  
+  "national_data": {
+    "ru": {
+      "passport": {
+        "series": "4510",
+        "number": "123456",
+        "issue_date": "10.05.2018",
+        "issued_by": "ГУ МВД России по г. Санкт-Петербургу"
+      },
+      "inn": "ENC[AES256_GCM](780112345678)",
+      "snils": "001-002-003 44",
+      "military": {
+        "registration_status": "served",
+        "military_id": "АБ 1234567"
+      }
+    },
+    "ua": {
+      "passport": {
+        "series": "КН",
+        "number": "654321",
+        "record_number": "112233445",
+        "issue_date": "15.03.2019",
+        "issued_by": "ДМС України"
+      },
+      "tin": "9876543210",
+      "diya_account": {
+        "has_diya_account": true,
+        "verification_level": "advanced",
+        "last_login": "2024-01-15T08:30:00Z"
+      }
+    }
+  },
+  
+  "jurisdictional_rules": {
+    "primary_jurisdiction": "RU",
+    "applicable_jurisdictions": ["RU", "UA"],
+    "conflict_resolution": "separate_namespaces",
+    "consent_management": {
+      "ru": {
+        "given": true,
+        "timestamp": "2024-01-01T00:00:00Z",
+        "purposes": ["tax", "employment", "social_benefits"]
+      },
+      "ua": {
+        "given": true,
+        "timestamp": "2024-01-01T00:00:00Z",
+        "legal_basis": "contractual_necessity"
+      }
+    }
+  },
+  
+  "extensions": {
+    "family_connections": {
+      "has_relatives_in_ru": true,
+      "has_relatives_in_ua": true,
+      "cross_border_family": true
+    },
+    "notes": "This profile demonstrates handling of dual citizenship with proper jurisdictional separation"
+  }
+}

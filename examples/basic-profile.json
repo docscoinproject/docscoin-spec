@@ -1,0 +1,79 @@
+{
+  "$schema": "../specification/schemas/global-profile.json",
+  "$comment": "Basic example of a DOCScoin profile with multi-level data",
+  "version": "1.0.0",
+  
+  "global_unique_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  
+  "international_status": {
+    "verification_level": "ENHANCED",
+    "data_protection_level": ["GDPR"],
+    "cross_border_consent": {
+      "granted": true,
+      "timestamp": "2024-01-22T14:30:00Z",
+      "jurisdictions": ["US", "EU", "UA"],
+      "purpose": "International business operations and travel"
+    }
+  },
+  
+  "international_contact": {
+    "verified_email_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "communication_preferences": {
+      "language": "en",
+      "channel": "EMAIL"
+    }
+  },
+  
+  "national_data": {
+    "ru": {
+      "passport": {
+        "series": "1234",
+        "number": "567890",
+        "issue_date": "15.01.2020",
+        "issued_by": "ОУФМС России по городу Москве"
+      },
+      "inn": "ENC[AES256_GCM](770112345678)",
+      "snils": "123-456-789 00"
+    },
+    "ua": {
+      "passport": {
+        "series": "АБ",
+        "number": "123456",
+        "record_number": "987654321"
+      },
+      "tin": "1234567890"
+    }
+  },
+  
+  "enterprise_data": {
+    "employee": {
+      "employee_id": "DOCS-2024-001",
+      "department": "Research & Development",
+      "position": "Standardization Architect",
+      "hire_date": "2024-01-01",
+      "employment_type": "full_time"
+    },
+    "compensation": {
+      "base_salary": {
+        "amount": 100000,
+        "currency": "USD",
+        "frequency": "annual"
+      }
+    },
+    "access_control": {
+      "system_access": [
+        {
+          "system": "DOCScoin Specification Repository",
+          "role": "maintainer",
+          "granted": "2024-01-01T09:00:00Z"
+        }
+      ]
+    }
+  },
+  
+  "extensions": {
+    "custom_notes": "This is an example profile for demonstration purposes",
+    "created_by": "DOCScoin Reference Implementation v0.1.0",
+    "last_updated": "2024-01-22T14:30:00Z"
+  }
+}
