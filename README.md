@@ -104,9 +104,9 @@ GitHub Discussions - для обсуждений:
 2. Star ⭐ проект - покажите поддержку
 3. Fork 🍴 - создайте свою копию для экспериментов
 
-## 📄 License
-- Documentation: Creative Commons Attribution 4.0 International
-- Code: Apache License 2.0
-- Trademarks: "DOCScoin" is a trademark
+## 📄 License & Attribution
+- **Our work**: Licensed under Apache 2.0 (code) and CC BY 4.0 (docs)
+- **References**: We reference but do not copy proprietary standards
+- **Compliance**: All external references are properly attributed
 
 ### DOCScoin Standard v0.1.0 • [View Changelog](https://changelog.md/)
