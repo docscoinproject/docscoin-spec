@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOCScoin Documentation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #f5f7fa;
+            color: #24292e;
+            line-height: 1.6;
+        }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .logo {
+            font-size: 3rem;
+            color: #0366d6;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #0366d6, #28a745);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            background: #0366d6;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #005cc5;
+            transform: translateY(-2px);
+        }
+        
+        .doc-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .doc-section h2 {
+            color: #0366d6;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eaecef;
+        }
+        
+        .file-list {
+            list-style: none;
+        }
+        
+        .file-list li {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f6f8fa;
+            border-radius: 8px;
+            border-left: 4px solid #0366d6;
+        }
+        
+        .file-list a {
+            color: #0366d6;
+            text-decoration: none;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .file-list a:hover {
+            text-decoration: underline;
+        }
+        
+        .file-description {
+            color: #586069;
+            font-size: 0.9rem;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eaecef;
+            color: #586069;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-file-contract"></i>
+            </div>
+            <h1>DOCScoin Documentation</h1>
+            <p>Complete specification and implementation guides</p>
+            
+            <div class="nav-buttons">
+                <a href="index.html" class="btn">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+                <a href="generator/" class="btn">
+                    <i class="fas fa-magic"></i> Document Generator
+                </a>
+                <a href="https://github.com/docscoinproject/docscoin-spec" target="_blank" class="btn">
+                    <i class="fab fa-github"></i> GitHub Repository
+                </a>
+            </div>
+        </header>
+        
+        <section class="doc-section">
+            <h2>📋 Specifications</h2>
+            <ul class="file-list">
+                <li>
+                    <a href="https://github.com/docscoinproject/docscoin-spec/blob/main/specification/01-global-level.md" target="_blank">
+                        <i class="fas fa-globe"></i> Global Level Specification
+                    </a>
+                    <div class="file-description">
+                        International identifiers, biometric hashes, cross-border consent management
+                    </div>
+                </li>
+                <li>
+                    <a href="https://github.com/docscoinproject/docscoin-spec/blob/main/specification/02-national-level.md" target="_blank">
+                        <i class="fas fa-flag"></i> National Level Specification
+                    </a>
+                    <div class="file-description">
+                        Country-specific fields for Russia, Ukraine, USA, China, India
+                    </div>
+                </li>
+                <li>
+                    <a href="https://github.com/docscoinproject/docscoin-spec/blob/main/specification/03-enterprise-level.md" target="_blank">
+                        <i class="fas fa-building"></i> Enterprise Level Specification
+                    </a>
+                    <div class="file-description">
+                        Organizational and HR data, compensation, access control
+                    </div>
+                </li>
+            </ul>
+        </section>
+        
+        <section class="doc-section">
+            <h2>🧪 Examples</h2>
+            <ul class="file-list">
+                <li>
+                    <a href="https://github.com/docscoinproject/docscoin-spec/blob/main/examples/basic-profile.json" target="_blank">
+                        <i class="fas fa-file-code"></i> Basic Profile Example
+                    </a>
+                    <div class="file-description">
+                        Complete example with all three levels (Global, National, Enterprise)
+                    </div>
+                </li>
+                <li>
+                    <a href="https://github.com/docscoinproject/docscoin-spec/blob/main/examples/ru-ua-profile.json" target="_blank">
+                        <i class="fas fa-passport"></i> RU/UA Dual Citizenship
+                    </a>
+                    <div class="file-description">
+                        Example profile for a person with both Russian and Ukrainian citizenship
+                    </div>
+                </li>
+            </ul>
+        </section>
+        
+        <section class="doc-section">
+            <h2>🛠️ Tools</h2>
+            <ul class="file-list">
+                <li>
+                    <a href="https://github.com/docscoinproject/docscoin-spec/blob/main/tools/validator.py" target="_blank">
+                        <i class="fas fa-check-circle"></i> JSON Validator
+                    </a>
+                    <div class="file-description">
+                        Python script to validate JSON data against DOCScoin schemas
+                    </div>
+                </li>
+                <li>
+                    <a href="https://github.com/docscoinproject/docscoin-spec/blob/main/tools/document-generator.py" target="_blank">
+                        <i class="fas fa-cogs"></i> Document Generator (Python)
+                    </a>
+                    <div class="file-description">
+                        Python script for generating documents from templates
+                    </div>
+                </li>
+            </ul>
+        </section>
+        
+        <footer class="footer">
+            <p>DOCScoin Standard v1.0.0 • Documentation Portal</p>
+            <p>All specifications are available in the GitHub repository</p>
+        </footer>
+    </div>
+</body>
+</html>

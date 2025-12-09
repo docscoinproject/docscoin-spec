@@ -258,8 +258,188 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 `;
                 break;
-                
-            // Add more templates as needed
+
+			case 'id-card':
+				templateHtml = `
+					<div class="document-header" style="text-align: center;">
+						<h3 class="document-title" style="color: #0366d6;">EMPLOYEE ID CARD</h3>
+						<p class="document-subtitle">Valid through: December 2026</p>
+					</div>
+					
+					<div style="display: flex; gap: 40px; margin: 40px 0;">
+						<!-- Left: Photo and basic info -->
+						<div style="flex: 1; text-align: center;">
+							<div style="width: 150px; height: 180px; background: #f0f0f0; border-radius: 8px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+								<i class="fas fa-user" style="font-size: 4rem; color: #6c757d;"></i>
+							</div>
+							<div style="margin-bottom: 30px;">
+								<h4 style="color: #24292e; margin-bottom: 5px;">
+									<span class="placeholder highlighted" data-field="ENTERPRISE:EMPLOYEE:FULL_NAME">[Employee Name]</span>
+								</h4>
+								<p style="color: #586069; margin-bottom: 5px;">
+									<span class="placeholder" data-field="ENTERPRISE:EMPLOYEE:POSITION">[Position]</span>
+								</p>
+								<p style="color: #0366d6; font-weight: 500;">
+									ID: <span class="placeholder" data-field="ENTERPRISE:EMPLOYEE:ID">[EMP-001]</span>
+								</p>
+							</div>
+							
+							<!-- QR Code placeholder -->
+							<div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e1e4e8; display: inline-block;">
+								<div style="width: 100px; height: 100px; background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+									<i class="fas fa-qrcode" style="font-size: 2.5rem; color: #6c757d;"></i>
+								</div>
+								<p style="font-size: 0.8rem; color: #586069; margin-top: 8px;">Scan for verification</p>
+							</div>
+						</div>
+						
+						<!-- Right: Detailed info -->
+						<div style="flex: 1;">
+							<div class="document-section">
+								<h4>PERSONAL INFORMATION</h4>
+								<table class="data-table">
+									<tr>
+										<td>Global ID:</td>
+										<td><span class="placeholder" data-field="GLOBAL:IDENTIFIER:GUID">[GUID]</span></td>
+									</tr>
+									<tr>
+										<td>Passport:</td>
+										<td>
+											<span class="placeholder" data-field="NATIONAL:RU:PASSPORT:SERIES">[1234]</span>
+											<span class="placeholder" data-field="NATIONAL:RU:PASSPORT:NUMBER">[567890]</span>
+										</td>
+									</tr>
+									<tr>
+										<td>Tax ID:</td>
+										<td><span class="placeholder" data-field="NATIONAL:RU:TAX:INN">[770112345678]</span></td>
+									</tr>
+									<tr>
+										<td>Department:</td>
+										<td><span class="placeholder" data-field="ENTERPRISE:EMPLOYEE:DEPARTMENT">[Department]</span></td>
+									</tr>
+									<tr>
+										<td>Hire Date:</td>
+										<td>2025-12-09</td>
+									</tr>
+								</table>
+							</div>
+							
+							<div class="document-section">
+								<h4>CONTACT</h4>
+								<p>Email: employee@company.com</p>
+								<p>Phone: +7 (XXX) XXX-XXXX</p>
+								<p>Office: Main Building, Floor 3</p>
+							</div>
+						</div>
+					</div>
+					
+					<div class="document-footer" style="text-align: center; border-top: 2px solid #eaecef; padding-top: 20px;">
+						<p>This card is property of [Company Name]. If found, please return.</p>
+						<p style="font-size: 0.9rem; color: #586069;">Issued: <span class="placeholder" data-field="DOCUMENT:DATE">[2025-12-09]</span></p>
+					</div>
+				`;
+				break;
+
+			case 'presentation':
+				templateHtml = `
+					<div class="document-header" style="text-align: center;">
+						<h3 class="document-title" style="color: #6f42c1;">EMPLOYEE OVERVIEW PRESENTATION</h3>
+						<p class="document-subtitle">Quarterly Performance Review - Q4 2025</p>
+					</div>
+					
+					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 30px 0;">
+						<!-- Slide 1: Basic Info -->
+						<div style="background: #f8f9fa; padding: 25px; border-radius: 12px; border-left: 4px solid #0366d6;">
+							<h4 style="color: #0366d6; margin-bottom: 15px;">Slide 1: Employee Profile</h4>
+							<div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+								<div style="width: 80px; height: 80px; background: #0366d6; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+									<i class="fas fa-user" style="font-size: 2rem; color: white;"></i>
+								</div>
+								<div>
+									<h3 style="margin: 0; color: #24292e;">
+										<span class="placeholder highlighted" data-field="ENTERPRISE:EMPLOYEE:FULL_NAME">[Employee Name]</span>
+									</h3>
+									<p style="color: #586069; margin: 5px 0;">
+										<span class="placeholder" data-field="ENTERPRISE:EMPLOYEE:POSITION">[Position]</span>
+									</p>
+									<p style="color: #0366d6; font-weight: 500;">
+										ID: <span class="placeholder" data-field="ENTERPRISE:EMPLOYEE:ID">[EMP-001]</span>
+									</p>
+								</div>
+							</div>
+							<table class="data-table">
+								<tr>
+									<td>Department:</td>
+									<td><span class="placeholder" data-field="ENTERPRISE:EMPLOYEE:DEPARTMENT">[Department]</span></td>
+								</tr>
+								<tr>
+									<td>Hire Date:</td>
+									<td>2025-12-09</td>
+								</tr>
+								<tr>
+									<td>Global ID:</td>
+									<td><span class="placeholder" data-field="GLOBAL:IDENTIFIER:GUID">[GUID]</span></td>
+								</tr>
+							</table>
+						</div>
+						
+						<!-- Slide 2: Performance -->
+						<div style="background: #f8f9fa; padding: 25px; border-radius: 12px; border-left: 4px solid #28a745;">
+							<h4 style="color: #28a745; margin-bottom: 15px;">Slide 2: Performance Metrics</h4>
+							<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+								<div style="text-align: center; background: white; padding: 15px; border-radius: 8px;">
+									<div style="font-size: 2rem; color: #28a745; font-weight: 700;">95%</div>
+									<div style="color: #586069; font-size: 0.9rem;">Performance Score</div>
+								</div>
+								<div style="text-align: center; background: white; padding: 15px; border-radius: 8px;">
+									<div style="font-size: 2rem; color: #17a2b8; font-weight: 700;">100%</div>
+									<div style="color: #586069; font-size: 0.9rem;">Attendance</div>
+								</div>
+							</div>
+							<div style="background: white; padding: 15px; border-radius: 8px;">
+								<h5 style="margin: 0 0 10px 0; color: #24292e;">Quarterly Goals</h5>
+								<ul style="margin: 0; padding-left: 20px; color: #586069;">
+									<li>Complete Project Alpha ✓</li>
+									<li>Team Training Completed ✓</li>
+									<li>Client Satisfaction: 98% ✓</li>
+								</ul>
+							</div>
+						</div>
+						
+						<!-- Slide 3: Compensation -->
+						<div style="background: #f8f9fa; padding: 25px; border-radius: 12px; border-left: 4px solid #fd7e14; grid-column: span 2;">
+							<h4 style="color: #fd7e14; margin-bottom: 15px;">Slide 3: Compensation & Benefits</h4>
+							<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+								<div style="text-align: center;">
+									<div style="font-size: 1.8rem; color: #24292e; font-weight: 700;">
+										<span class="placeholder" data-field="ENTERPRISE:SALARY:BASE">[85000]</span>
+									</div>
+									<div style="color: #586069;">Base Salary</div>
+									<div style="color: #0366d6; font-size: 0.9rem;">
+										<span class="placeholder" data-field="ENTERPRISE:SALARY:CURRENCY">[USD]</span>/year
+									</div>
+								</div>
+								<div style="text-align: center;">
+									<div style="font-size: 1.8rem; color: #24292e; font-weight: 700;">15%</div>
+									<div style="color: #586069;">Annual Bonus</div>
+									<div style="color: #28a745; font-size: 0.9rem;">Performance-based</div>
+								</div>
+								<div style="text-align: center;">
+									<div style="font-size: 1.8rem; color: #24292e; font-weight: 700;">Full</div>
+									<div style="color: #586069;">Benefits Package</div>
+									<div style="color: #6f42c1; font-size: 0.9rem;">Health + Retirement</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="document-footer" style="text-align: center; padding-top: 20px; border-top: 2px solid #eaecef;">
+						<p style="color: #586069;">Presentation generated automatically from DOCScoin Standard data</p>
+						<p style="font-size: 0.9rem;">Last updated: <span class="placeholder" data-field="DOCUMENT:DATE">[2025-12-09]</span></p>
+					</div>
+				`;
+				break;
+			// Add more templates as needed
         }
         
         documentPreview.innerHTML = templateHtml;

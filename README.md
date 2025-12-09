@@ -87,7 +87,7 @@ cd docscoin-spec
 ## 📞 Contact & Community
 
 ### 🐛 Report Issues & Request Features
-https://img.shields.io/github/issues/docscoinproject/docscoin-spec?color=blue&label=Issues&logo=github
+[![GitHub Issues](https://img.shields.io/github/issues/docscoinproject/docscoin-spec?color=blue&label=Issues&logo=github)](https://github.com/docscoinproject/docscoin-spec/issues)
 
 GitHub Issues - для багов и запросов функций:
 
