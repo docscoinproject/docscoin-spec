@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOCScoin Document Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-file-contract"></i>
+                <h1>DOCScoin Document Generator</h1>
+            </div>
+            <p class="subtitle">Generate documents using DOCScoin Standard templates</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Left Panel: Configuration -->
+            <div class="config-panel">
+                <section class="config-section">
+                    <h2><i class="fas fa-cog"></i> Configuration</h2>
+                    
+                    <!-- Step 1: Select Standard -->
+                    <div class="step">
+                        <div class="step-header">
+                            <span class="step-number">1</span>
+                            <h3>Select Standard Level</h3>
+                        </div>
+                        <div class="step-content">
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="standard" value="global" checked>
+                                    <span class="radio-custom"></span>
+                                    <span class="radio-text">
+                                        <strong>Global Level</strong>
+                                        <small>International identifiers and basic data</small>
+                                    </span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="standard" value="national">
+                                    <span class="radio-custom"></span>
+                                    <span class="radio-text">
+                                        <strong>National Level</strong>
+                                        <small>Country-specific data (RU, UA, US, CN, IN)</small>
+                                    </span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="standard" value="enterprise">
+                                    <span class="radio-custom"></span>
+                                    <span class="radio-text">
+                                        <strong>Enterprise Level</strong>
+                                        <small>Organizational and HR data</small>
+                                    </span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="standard" value="all">
+                                    <span class="radio-custom"></span>
+                                    <span class="radio-text">
+                                        <strong>All Levels</strong>
+                                        <small>Complete profile with all data</small>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Select Country (for National level) -->
+                    <div class="step" id="country-step" style="display: none;">
+                        <div class="step-header">
+                            <span class="step-number">2</span>
+                            <h3>Select Country</h3>
+                        </div>
+                        <div class="step-content">
+                            <div class="country-grid">
+                                <label class="country-option">
+                                    <input type="checkbox" name="country" value="ru">
+                                    <div class="country-card">
+                                        <span class="flag">🇷🇺</span>
+                                        <span class="country-name">Russia</span>
+                                        <small>ИНН, Паспорт, СНИЛС</small>
+                                    </div>
+                                </label>
+                                <label class="country-option">
+                                    <input type="checkbox" name="country" value="ua">
+                                    <div class="country-card">
+                                        <span class="flag">🇺🇦</span>
+                                        <span class="country-name">Ukraine</span>
+                                        <small>РНОКПП, Паспорт</small>
+                                    </div>
+                                </label>
+                                <label class="country-option">
+                                    <input type="checkbox" name="country" value="us">
+                                    <div class="country-card">
+                                        <span class="flag">🇺🇸</span>
+                                        <span class="country-name">USA</span>
+                                        <small>SSN, Driver License</small>
+                                    </div>
+                                </label>
+                                <label class="country-option">
+                                    <input type="checkbox" name="country" value="cn">
+                                    <div class="country-card">
+                                        <span class="flag">🇨🇳</span>
+                                        <span class="country-name">China</span>
+                                        <small>ID Card, Social Code</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Select Template -->
+                    <div class="step">
+                        <div class="step-header">
+                            <span class="step-number">3</span>
+                            <h3>Select Template</h3>
+                        </div>
+                        <div class="step-content">
+                            <div class="template-grid">
+                                <label class="template-option">
+                                    <input type="radio" name="template" value="employment-contract" checked>
+                                    <div class="template-card">
+                                        <i class="fas fa-file-signature"></i>
+                                        <h4>Employment Contract</h4>
+                                        <p>Standard work agreement</p>
+                                        <span class="format-badge">DOC/PDF</span>
+                                    </div>
+                                </label>
+                                <label class="template-option">
+                                    <input type="radio" name="template" value="pay-slip">
+                                    <div class="template-card">
+                                        <i class="fas fa-file-invoice-dollar"></i>
+                                        <h4>Pay Slip</h4>
+                                        <p>Salary calculation</p>
+                                        <span class="format-badge">Excel/PDF</span>
+                                    </div>
+                                </label>
+                                <label class="template-option">
+                                    <input type="radio" name="template" value="id-card">
+                                    <div class="template-card">
+                                        <i class="fas fa-id-card"></i>
+                                        <h4>ID Card</h4>
+                                        <p>Employee identification</p>
+                                        <span class="format-badge">PDF</span>
+                                    </div>
+                                </label>
+                                <label class="template-option">
+                                    <input type="radio" name="template" value="presentation">
+                                    <div class="template-card">
+                                        <i class="fas fa-presentation"></i>
+                                        <h4>Presentation</h4>
+                                        <p>Employee overview</p>
+                                        <span class="format-badge">PowerPoint</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Data Input -->
+                    <div class="step">
+                        <div class="step-header">
+                            <span class="step-number">4</span>
+                            <h3>Enter Data</h3>
+                        </div>
+                        <div class="step-content">
+                            <div class="data-input">
+                                <div class="input-group">
+                                    <label for="employeeName">Full Name</label>
+                                    <input type="text" id="employeeName" placeholder="Ivan Ivanov">
+                                </div>
+                                <div class="input-row">
+                                    <div class="input-group">
+                                        <label for="passportSeries">Passport Series</label>
+                                        <input type="text" id="passportSeries" placeholder="1234">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="passportNumber">Passport Number</label>
+                                        <input type="text" id="passportNumber" placeholder="567890">
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label for="inn">Tax ID (INN)</label>
+                                    <input type="text" id="inn" placeholder="770112345678">
+                                </div>
+                                <div class="input-row">
+                                    <div class="input-group">
+                                        <label for="position">Position</label>
+                                        <input type="text" id="position" placeholder="Senior Developer">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="salary">Salary</label>
+                                        <input type="number" id="salary" placeholder="85000">
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label for="currency">Currency</label>
+                                    <select id="currency">
+                                        <option value="RUB">RUB - Russian Ruble</option>
+                                        <option value="UAH">UAH - Ukrainian Hryvnia</option>
+                                        <option value="USD" selected>USD - US Dollar</option>
+                                        <option value="EUR">EUR - Euro</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Panel: Preview -->
+            <div class="preview-panel">
+                <section class="preview-section">
+                    <div class="preview-header">
+                        <h2><i class="fas fa-eye"></i> Document Preview</h2>
+                        <div class="preview-actions">
+                            <button class="btn btn-secondary" id="refreshPreview">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-content">
+                        <!-- WYSIWYG Editor / Preview -->
+                        <div class="wysiwyg-container">
+                            <div class="document-preview" id="documentPreview">
+                                <!-- Dynamic content will be inserted here -->
+                                <div class="document-header">
+                                    <h3 class="document-title">EMPLOYMENT CONTRACT</h3>
+                                    <p class="document-subtitle">Agreement No: <span class="placeholder" data-field="GLOBAL:IDENTIFIER:GUID">[GUID]</span></p>
+                                </div>
+                                
+                                <div class="document-section">
+                                    <h4>PARTIES</h4>
+                                    <p>This Employment Contract is made between:</p>
+                                    <p><strong>Employer:</strong> [Company Name]</p>
+                                    <p><strong>Employee:</strong> <span class="placeholder highlighted" data-field="ENTERPRISE:EMPLOYEE:FULL_NAME">[Employee Full Name]</span></p>
+                                </div>
+                                
+                                <div class="document-section">
+                                    <h4>EMPLOYEE INFORMATION</h4>
+                                    <table class="data-table">
+                                        <tr>
+                                            <td>Passport:</td>
+                                            <td>
+                                                Series: <span class="placeholder" data-field="NATIONAL:RU:PASSPORT:SERIES">[1234]</span>
+                                                Number: <span class="placeholder" data-field="NATIONAL:RU:PASSPORT:NUMBER">[567890]</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Tax ID (INN):</td>
+                                            <td><span class="placeholder" data-field="NATIONAL:RU:TAX:INN">[770112345678]</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Employee ID:</td>
+                                            <td><span class="placeholder" data-field="ENTERPRISE:EMPLOYEE:ID">[EMP-001]</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Position:</td>
+                                            <td><span class="placeholder" data-field="ENTERPRISE:EMPLOYEE:POSITION">[Position]</span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                                <div class="document-section">
+                                    <h4>COMPENSATION</h4>
+                                    <p>Base Salary: <span class="placeholder" data-field="ENTERPRISE:SALARY:BASE">[85000]</span> 
+                                       <span class="placeholder" data-field="ENTERPRISE:SALARY:CURRENCY">[USD]</span> per year</p>
+                                </div>
+                                
+                                <div class="document-footer">
+                                    <p>Date: <span class="placeholder" data-field="DOCUMENT:DATE">[2025-12-09]</span></p>
+                                    <p>Signature: _________________________</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Generation Buttons -->
+                        <div class="generation-buttons">
+                            <button class="btn btn-primary btn-large" id="generatePdf">
+                                <i class="fas fa-file-pdf"></i> Generate PDF
+                            </button>
+                            <button class="btn btn-success btn-large" id="generateDoc">
+                                <i class="fas fa-file-word"></i> Generate Word Document
+                            </button>
+                            <button class="btn btn-excel btn-large" id="generateExcel">
+                                <i class="fas fa-file-excel"></i> Generate Excel
+                            </button>
+                            <button class="btn btn-secondary btn-large" id="generateJson">
+                                <i class="fas fa-code"></i> Export as JSON
+                            </button>
+                        </div>
+
+                        <!-- Status Messages -->
+                        <div class="status-area">
+                            <div id="statusMessage" class="status-message hidden">
+                                <i class="fas fa-info-circle"></i>
+                                <span id="statusText">Ready to generate documents</span>
+                            </div>
+                            <div id="fieldStatus" class="field-status">
+                                <h4>Fields Status</h4>
+                                <div class="fields-list">
+                                    <!-- Dynamic field status will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-file-contract"></i>
+                    <span>DOCScoin Standard v1.0.0</span>
+                </div>
+                <div class="footer-links">
+                    <a href="https://github.com/docscoinproject/docscoin-spec" target="_blank">
+                        <i class="fab fa-github"></i> GitHub
+                    </a>
+                    <a href="https://docscoinproject.github.io/docscoin-spec/" target="_blank">
+                        <i class="fas fa-book"></i> Documentation
+                    </a>
+                    <a href="#" id="loadSample">
+                        <i class="fas fa-download"></i> Load Sample Data
+                    </a>
+                </div>
+            </div>
+            <p class="footer-note">
+                This is a demonstration interface for DOCScoin Standard document generation.
+                All data is processed locally in your browser.
+            </p>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>

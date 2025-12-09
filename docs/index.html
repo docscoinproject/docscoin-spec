@@ -5,106 +5,222 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DOCScoin Standard</title>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            line-height: 1.6;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #24292e;
         }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        /* Header */
         .header {
             text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .logo {
+            font-size: 4rem;
+            color: #0366d6;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #0366d6, #28a745);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            color: #586069;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        
+        /* Navigation Cards */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
             margin-bottom: 40px;
         }
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            margin: 0 5px;
+        .nav-card {
+            background: white;
+            border-radius: 16px;
+            padding: 35px 30px;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: all 0.3s ease;
+            border: 2px solid #e1e4e8;
+            text-align: center;
         }
-        .badge-cc { background: #007ec6; color: white; }
-        .badge-apache { background: #d22128; color: white; }
-        .section {
-            margin: 30px 0;
-            padding: 20px;
-            border-left: 4px solid #0366d6;
-            background: #f6f8fa;
+        .nav-card:hover {
+            transform: translateY(-5px);
+            border-color: #0366d6;
+            box-shadow: 0 15px 35px rgba(3, 102, 214, 0.15);
+        }
+        .nav-card i {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .nav-card.generator i { color: #0366d6; }
+        .nav-card.docs i { color: #28a745; }
+        .nav-card.examples i { color: #6f42c1; }
+        .nav-card.github i { color: #24292e; }
+        
+        .nav-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #24292e;
+        }
+        .nav-card p {
+            color: #586069;
+            line-height: 1.6;
+        }
+        
+        /* Quick Links */
+        .quick-links {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        .quick-links h2 {
+            margin-bottom: 20px;
+            color: #24292e;
         }
         .link-list {
-            list-style: none;
-            padding: 0;
-        }
-        .link-list li {
-            margin: 10px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
         }
         .link-list a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            background: #f6f8fa;
+            border-radius: 8px;
             text-decoration: none;
             color: #0366d6;
-            padding: 5px 10px;
-            display: block;
-            border-radius: 4px;
+            transition: all 0.3s;
         }
         .link-list a:hover {
-            background: #e1e4e8;
+            background: #0366d6;
+            color: white;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: #586069;
+            border-top: 1px solid #e1e4e8;
+            margin-top: 40px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .header { padding: 40px 20px; }
+            h1 { font-size: 2.2rem; }
+            .nav-grid { grid-template-columns: 1fr; }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="header">
-        <h1>🌐 DOCScoin Standard</h1>
-        <p><em>Open Standard for Secure Digital Document Management with Blockchain Audit</em></p>
-        <p>
-            <span class="badge badge-cc">Docs: CC BY 4.0</span>
-            <span class="badge badge-apache">Code: Apache 2.0</span>
-        </p>
-    </div>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-file-contract"></i>
+            </div>
+            <h1>DOCScoin Standard</h1>
+            <p class="subtitle">
+                Open Standard for Secure Digital Document Management with Blockchain Audit
+            </p>
+        </header>
 
-    <div class="section">
-        <h2>📚 Quick Navigation</h2>
-        
-        <h3>📋 Specifications</h3>
-        <ul class="link-list">
-            <li><a href="../specification/01-global-level.md">Global Level Specification</a></li>
-            <li><a href="../specification/02-national-level.md">National Level Specification</a></li>
-            <li><a href="../specification/03-enterprise-level.md">Enterprise Level Specification</a></li>
-            <li><a href="../specification/template-fields-registry.md">Template Fields Registry</a></li>
-        </ul>
-
-        <h3>🧪 Examples</h3>
-        <ul class="link-list">
-            <li><a href="../examples/basic-profile.json">Basic Profile Example</a></li>
-            <li><a href="../examples/ru-ua-profile.json">RU/UA Dual Citizenship</a></li>
-        </ul>
-
-        <h3>🛠️ Tools</h3>
-        <ul class="link-list">
-            <li><a href="../tools/validator.py">JSON Validator</a></li>
-            <li><a href="../tools/document-generator.py">Document Generator</a></li>
-            <li><a href="../tools/create_database.py">Database Creator</a></li>
-        </ul>
-
-        <h3>👥 Community</h3>
-        <ul class="link-list">
-            <li><a href="../governance/CONTRIBUTING.md">Contribution Guide</a></li>
-            <li><a href="../governance/GOVERNANCE.md">Governance Model</a></li>
-            <li><a href="../CODE_OF_CONDUCT.md">Code of Conduct</a></li>
-        </ul>
-    </div>
-
-    <div class="section">
-        <h2>🔗 GitHub Repository</h2>
-        <p>
-            <a href="https://github.com/docscoinproject/docscoin-spec" 
-               style="background: #24292e; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
-                View on GitHub
+        <!-- Main Navigation -->
+        <div class="nav-grid">
+            <a href="generator/" class="nav-card generator">
+                <i class="fas fa-magic"></i>
+                <h3>Document Generator</h3>
+                <p>Interactive web interface for generating documents using DOCScoin templates</p>
             </a>
-        </p>
-        <p>⭐ Star the repository to show your support!</p>
-    </div>
+            
+            <a href="specification/01-global-level.md" class="nav-card docs">
+                <i class="fas fa-book"></i>
+                <h3>Specification</h3>
+                <p>Read the full DOCScoin Standard specification (Global, National, Enterprise levels)</p>
+            </a>
+            
+            <a href="examples/basic-profile.json" class="nav-card examples">
+                <i class="fas fa-code"></i>
+                <h3>Examples & Code</h3>
+                <p>View sample JSON profiles and implementation examples</p>
+            </a>
+            
+            <a href="https://github.com/docscoinproject/docscoin-spec" target="_blank" class="nav-card github">
+                <i class="fab fa-github"></i>
+                <h3>GitHub Repository</h3>
+                <p>View source code, report issues, or contribute to the project</p>
+            </a>
+        </div>
 
-    <footer style="text-align: center; margin-top: 40px; color: #586069;">
-        <p>DOCScoin Standard • Last updated: January 2024</p>
-    </footer>
+        <!-- Quick Links -->
+        <section class="quick-links">
+            <h2>Quick Links</h2>
+            <div class="link-list">
+                <a href="specification/01-global-level.md">
+                    <i class="fas fa-globe"></i>
+                    <span>Global Level Specification</span>
+                </a>
+                <a href="specification/02-national-level.md">
+                    <i class="fas fa-flag"></i>
+                    <span>National Level (RU/UA/US/CN/IN)</span>
+                </a>
+                <a href="specification/03-enterprise-level.md">
+                    <i class="fas fa-building"></i>
+                    <span>Enterprise Level</span>
+                </a>
+                <a href="specification/template-fields-registry.md">
+                    <i class="fas fa-list-alt"></i>
+                    <span>Template Fields Registry</span>
+                </a>
+                <a href="examples/basic-profile.json">
+                    <i class="fas fa-file-code"></i>
+                    <span>Basic Profile Example</span>
+                </a>
+                <a href="examples/ru-ua-profile.json">
+                    <i class="fas fa-passport"></i>
+                    <span>RU/UA Dual Citizenship</span>
+                </a>
+                <a href="tools/validator.py">
+                    <i class="fas fa-check-circle"></i>
+                    <span>JSON Validator</span>
+                </a>
+                <a href="tools/document-generator.py">
+                    <i class="fas fa-cogs"></i>
+                    <span>Python Generator</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>DOCScoin Standard v1.0.0 • Released December 2025</p>
+            <p>Licensed under Apache 2.0 (code) and CC BY 4.0 (documentation)</p>
+        </footer>
+    </div>
 </body>
 </html>

@@ -1,0 +1,575 @@
+// DOCScoin Document Generator - JavaScript Logic
+
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const standardRadios = document.querySelectorAll('input[name="standard"]');
+    const countryStep = document.getElementById('country-step');
+    const countryCheckboxes = document.querySelectorAll('input[name="country"]');
+    const templateRadios = document.querySelectorAll('input[name="template"]');
+    const documentPreview = document.getElementById('documentPreview');
+    const generatePdfBtn = document.getElementById('generatePdf');
+    const generateDocBtn = document.getElementById('generateDoc');
+    const generateExcelBtn = document.getElementById('generateExcel');
+    const generateJsonBtn = document.getElementById('generateJson');
+    const refreshPreviewBtn = document.getElementById('refreshPreview');
+    const loadSampleBtn = document.getElementById('loadSample');
+    const statusMessage = document.getElementById('statusMessage');
+    const statusText = document.getElementById('statusText');
+    const fieldsList = document.querySelector('.fields-list');
+
+    // Sample data
+    const sampleData = {
+        employeeName: "Ivan Ivanov",
+        passportSeries: "1234",
+        passportNumber: "567890",
+        inn: "770112345678",
+        position: "Senior Developer",
+        salary: "85000",
+        currency: "USD",
+        employeeId: "EMP-2025-001",
+        department: "Software Development",
+        hireDate: "2025-12-09",
+        guid: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+    };
+
+    // Field mapping configuration
+    const fieldMapping = {
+        // Global fields
+        'GLOBAL:IDENTIFIER:GUID': () => sampleData.guid,
+        
+        // Russia fields
+        'NATIONAL:RU:PASSPORT:SERIES': () => sampleData.passportSeries,
+        'NATIONAL:RU:PASSPORT:NUMBER': () => sampleData.passportNumber,
+        'NATIONAL:RU:TAX:INN': () => sampleData.inn,
+        
+        // Ukraine fields
+        'NATIONAL:UA:PASSPORT:SERIES': () => "АБ",
+        'NATIONAL:UA:PASSPORT:NUMBER': () => "123456",
+        'NATIONAL:UA:TAX:TIN': () => "1234567890",
+        
+        // Enterprise fields
+        'ENTERPRISE:EMPLOYEE:FULL_NAME': () => sampleData.employeeName,
+        'ENTERPRISE:EMPLOYEE:ID': () => sampleData.employeeId,
+        'ENTERPRISE:EMPLOYEE:POSITION': () => sampleData.position,
+        'ENTERPRISE:SALARY:BASE': () => sampleData.salary,
+        'ENTERPRISE:SALARY:CURRENCY': () => sampleData.currency,
+        'ENTERPRISE:EMPLOYEE:DEPARTMENT': () => sampleData.department,
+        
+        // Document fields
+        'DOCUMENT:DATE': () => new Date().toISOString().split('T')[0],
+        'DOCUMENT:NUMBER': () => `DOC-${Date.now().toString().slice(-6)}`
+    };
+
+    // Initialize
+    init();
+
+    function init() {
+        // Event Listeners
+        standardRadios.forEach(radio => {
+            radio.addEventListener('change', handleStandardChange);
+        });
+
+        countryCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updatePreview);
+        });
+
+        templateRadios.forEach(radio => {
+            radio.addEventListener('change', handleTemplateChange);
+        });
+
+        // Input fields live update
+        const inputFields = ['employeeName', 'passportSeries', 'passportNumber', 
+                           'inn', 'position', 'salary', 'currency'];
+        inputFields.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', updatePreview);
+            }
+        });
+
+        // Button events
+        generatePdfBtn.addEventListener('click', generatePdf);
+        generateDocBtn.addEventListener('click', generateDoc);
+        generateExcelBtn.addEventListener('click', generateExcel);
+        generateJsonBtn.addEventListener('click', generateJson);
+        refreshPreviewBtn.addEventListener('click', updatePreview);
+        loadSampleBtn.addEventListener('click', loadSampleData);
+
+        // Initial preview
+        updatePreview();
+        updateFieldStatus();
+    }
+
+    function handleStandardChange() {
+        const selectedStandard = document.querySelector('input[name="standard"]:checked').value;
+        
+        // Show/hide country selection based on standard
+        if (selectedStandard === 'national' || selectedStandard === 'all') {
+            countryStep.style.display = 'block';
+        } else {
+            countryStep.style.display = 'none';
+        }
+        
+        updatePreview();
+    }
+
+    function handleTemplateChange() {
+        const selectedTemplate = document.querySelector('input[name="template"]:checked').value;
+        
+        // Update preview based on template
+        updateDocumentTemplate(selectedTemplate);
+        updatePreview();
+    }
+
+    function updateDocumentTemplate(template) {
+        let templateHtml = '';
+        
+        switch(template) {
+            case 'employment-contract':
+                templateHtml = `
+                    <div class="document-header">
+                        <h3 class="document-title">EMPLOYMENT CONTRACT</h3>
+                        <p class="document-subtitle">Agreement No: <span class="placeholder" data-field="DOCUMENT:NUMBER">[DOC-001]</span></p>
+                    </div>
+                    
+                    <div class="document-section">
+                        <h4>PARTIES</h4>
+                        <p>This Employment Contract is made between:</p>
+                        <p><strong>Employer:</strong> [Company Name]</p>
+                        <p><strong>Employee:</strong> <span class="placeholder highlighted" data-field="ENTERPRISE:EMPLOYEE:FULL_NAME">[Employee Full Name]</span></p>
+                    </div>
+                    
+                    <div class="document-section">
+                        <h4>EMPLOYEE INFORMATION</h4>
+                        <table class="data-table">
+                            <tr>
+                                <td>Passport:</td>
+                                <td>
+                                    Series: <span class="placeholder" data-field="NATIONAL:RU:PASSPORT:SERIES">[1234]</span>
+                                    Number: <span class="placeholder" data-field="NATIONAL:RU:PASSPORT:NUMBER">[567890]</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Tax ID (INN):</td>
+                                <td><span class="placeholder" data-field="NATIONAL:RU:TAX:INN">[770112345678]</span></td>
+                            </tr>
+                            <tr>
+                                <td>Employee ID:</td>
+                                <td><span class="placeholder" data-field="ENTERPRISE:EMPLOYEE:ID">[EMP-001]</span></td>
+                            </tr>
+                            <tr>
+                                <td>Position:</td>
+                                <td><span class="placeholder" data-field="ENTERPRISE:EMPLOYEE:POSITION">[Position]</span></td>
+                            </tr>
+                            <tr>
+                                <td>Department:</td>
+                                <td><span class="placeholder" data-field="ENTERPRISE:EMPLOYEE:DEPARTMENT">[Department]</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="document-section">
+                        <h4>COMPENSATION</h4>
+                        <p>Base Salary: <span class="placeholder" data-field="ENTERPRISE:SALARY:BASE">[85000]</span> 
+                           <span class="placeholder" data-field="ENTERPRISE:SALARY:CURRENCY">[USD]</span> per year</p>
+                    </div>
+                    
+                    <div class="document-footer">
+                        <p>Date: <span class="placeholder" data-field="DOCUMENT:DATE">[2025-12-09]</span></p>
+                        <p>Signature: _________________________</p>
+                    </div>
+                `;
+                break;
+                
+            case 'pay-slip':
+                templateHtml = `
+                    <div class="document-header">
+                        <h3 class="document-title">PAY SLIP</h3>
+                        <p class="document-subtitle">Period: December 2025 | Employee ID: <span class="placeholder" data-field="ENTERPRISE:EMPLOYEE:ID">[EMP-001]</span></p>
+                    </div>
+                    
+                    <div class="document-section">
+                        <h4>EMPLOYEE DETAILS</h4>
+                        <table class="data-table">
+                            <tr>
+                                <td>Name:</td>
+                                <td><span class="placeholder" data-field="ENTERPRISE:EMPLOYEE:FULL_NAME">[Employee Name]</span></td>
+                            </tr>
+                            <tr>
+                                <td>Position:</td>
+                                <td><span class="placeholder" data-field="ENTERPRISE:EMPLOYEE:POSITION">[Position]</span></td>
+                            </tr>
+                            <tr>
+                                <td>Department:</td>
+                                <td><span class="placeholder" data-field="ENTERPRISE:EMPLOYEE:DEPARTMENT">[Department]</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="document-section">
+                        <h4>EARNINGS</h4>
+                        <table class="data-table">
+                            <tr>
+                                <td>Basic Salary:</td>
+                                <td><span class="placeholder" data-field="ENTERPRISE:SALARY:BASE">[85000]</span> <span class="placeholder" data-field="ENTERPRISE:SALARY:CURRENCY">[USD]</span></td>
+                            </tr>
+                            <tr>
+                                <td>Bonus:</td>
+                                <td>5,000 <span class="placeholder" data-field="ENTERPRISE:SALARY:CURRENCY">[USD]</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total Gross:</strong></td>
+                                <td><strong>90,000 <span class="placeholder" data-field="ENTERPRISE:SALARY:CURRENCY">[USD]</span></strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="document-section">
+                        <h4>DEDUCTIONS</h4>
+                        <table class="data-table">
+                            <tr>
+                                <td>Tax (13%):</td>
+                                <td>11,700 <span class="placeholder" data-field="ENTERPRISE:SALARY:CURRENCY">[USD]</span></td>
+                            </tr>
+                            <tr>
+                                <td>Social Security:</td>
+                                <td>2,500 <span class="placeholder" data-field="ENTERPRISE:SALARY:CURRENCY">[USD]</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total Deductions:</strong></td>
+                                <td><strong>14,200 <span class="placeholder" data-field="ENTERPRISE:SALARY:CURRENCY">[USD]</span></strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="document-section">
+                        <h4>NET PAY</h4>
+                        <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                            <h2 style="color: #28a745; margin: 0;">
+                                75,800 <span class="placeholder" data-field="ENTERPRISE:SALARY:CURRENCY">[USD]</span>
+                            </h2>
+                            <p style="color: #586069; margin-top: 5px;">Amount payable</p>
+                        </div>
+                    </div>
+                    
+                    <div class="document-footer">
+                        <p>Payment Date: <span class="placeholder" data-field="DOCUMENT:DATE">[2025-12-09]</span></p>
+                        <p>Authorized Signature: _________________________</p>
+                    </div>
+                `;
+                break;
+                
+            // Add more templates as needed
+        }
+        
+        documentPreview.innerHTML = templateHtml;
+    }
+
+    function updatePreview() {
+        // Get current form values
+        sampleData.employeeName = document.getElementById('employeeName').value || sampleData.employeeName;
+        sampleData.passportSeries = document.getElementById('passportSeries').value || sampleData.passportSeries;
+        sampleData.passportNumber = document.getElementById('passportNumber').value || sampleData.passportNumber;
+        sampleData.inn = document.getElementById('inn').value || sampleData.inn;
+        sampleData.position = document.getElementById('position').value || sampleData.position;
+        sampleData.salary = document.getElementById('salary').value || sampleData.salary;
+        sampleData.currency = document.getElementById('currency').value || sampleData.currency;
+        
+        // Update all placeholders in the document
+        const placeholders = documentPreview.querySelectorAll('.placeholder');
+        placeholders.forEach(placeholder => {
+            const fieldCode = placeholder.getAttribute('data-field');
+            if (fieldCode && fieldMapping[fieldCode]) {
+                const value = fieldMapping[fieldCode]();
+                if (value) {
+                    placeholder.textContent = value;
+                    
+                    // Check if it's a highlighted field
+                    if (placeholder.classList.contains('highlighted')) {
+                        if (value.startsWith('[')) {
+                            placeholder.style.background = '#f8d7da';
+                            placeholder.style.color = '#721c24';
+                            placeholder.style.borderColor = '#f5c6cb';
+                        } else {
+                            placeholder.style.background = '#d4edda';
+                            placeholder.style.color = '#155724';
+                            placeholder.style.borderColor = '#c3e6cb';
+                        }
+                    }
+                }
+            }
+        });
+        
+        updateFieldStatus();
+    }
+
+    function updateFieldStatus() {
+        fieldsList.innerHTML = '';
+        
+        // Get selected standard
+        const selectedStandard = document.querySelector('input[name="standard"]:checked').value;
+        
+        // Define fields based on standard
+        let fields = [];
+        
+        switch(selectedStandard) {
+            case 'global':
+                fields = ['GLOBAL:IDENTIFIER:GUID'];
+                break;
+            case 'national':
+                fields = [
+                    'NATIONAL:RU:PASSPORT:SERIES',
+                    'NATIONAL:RU:PASSPORT:NUMBER',
+                    'NATIONAL:RU:TAX:INN'
+                ];
+                break;
+            case 'enterprise':
+                fields = [
+                    'ENTERPRISE:EMPLOYEE:FULL_NAME',
+                    'ENTERPRISE:EMPLOYEE:ID',
+                    'ENTERPRISE:EMPLOYEE:POSITION',
+                    'ENTERPRISE:SALARY:BASE',
+                    'ENTERPRISE:SALARY:CURRENCY'
+                ];
+                break;
+            case 'all':
+                fields = Object.keys(fieldMapping);
+                break;
+        }
+        
+        // Create field status items
+        fields.forEach(fieldCode => {
+            const value = fieldMapping[fieldCode] ? fieldMapping[fieldCode]() : '';
+            const hasValue = value && !value.startsWith('[');
+            
+            const fieldItem = document.createElement('div');
+            fieldItem.className = `field-item ${hasValue ? '' : 'missing'}`;
+            fieldItem.innerHTML = `
+                <i class="fas ${hasValue ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${fieldCode}</span>
+            `;
+            
+            fieldsList.appendChild(fieldItem);
+        });
+    }
+
+    function loadSampleData() {
+        document.getElementById('employeeName').value = sampleData.employeeName;
+        document.getElementById('passportSeries').value = sampleData.passportSeries;
+        document.getElementById('passportNumber').value = sampleData.passportNumber;
+        document.getElementById('inn').value = sampleData.inn;
+        document.getElementById('position').value = sampleData.position;
+        document.getElementById('salary').value = sampleData.salary;
+        document.getElementById('currency').value = sampleData.currency;
+        
+        showStatus('Sample data loaded successfully!', 'success');
+        updatePreview();
+    }
+
+    // Generation functions
+    function generatePdf() {
+        showStatus('Generating PDF document...', 'info');
+        
+        // In a real implementation, this would call a backend or use a library like jsPDF
+        setTimeout(() => {
+            showStatus('PDF generated successfully!', 'success');
+            
+            // Create a dummy download
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + 
+                encodeURIComponent('This would be a PDF file in a real implementation'));
+            element.setAttribute('download', `DOCScoin_Contract_${Date.now()}.pdf`);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }, 1500);
+    }
+
+    function generateDoc() {
+        showStatus('Generating Word document...', 'info');
+        
+        // For Word, we can generate a simple text file or use a template
+        const content = generateDocumentContent('word');
+        
+        setTimeout(() => {
+            showStatus('Word document generated successfully!', 'success');
+            
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + 
+                encodeURIComponent(content));
+            element.setAttribute('download', `DOCScoin_Contract_${Date.now()}.doc`);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }, 1500);
+    }
+
+    function generateExcel() {
+        showStatus('Generating Excel spreadsheet...', 'info');
+        
+        // Generate CSV content
+        const csvContent = generateCsvContent();
+        
+        setTimeout(() => {
+            showStatus('Excel file generated successfully!', 'success');
+            
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/csv;charset=utf-8,' + 
+                encodeURIComponent(csvContent));
+            element.setAttribute('download', `DOCScoin_Data_${Date.now()}.csv`);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }, 1500);
+    }
+
+    function generateJson() {
+        showStatus('Generating JSON data...', 'info');
+        
+        // Generate DOCScoin JSON according to our standard
+        const docData = generateDOCScoinJson();
+        
+        setTimeout(() => {
+            showStatus('JSON data exported successfully!', 'success');
+            
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:application/json;charset=utf-8,' + 
+                encodeURIComponent(JSON.stringify(docData, null, 2)));
+            element.setAttribute('download', `DOCScoin_Profile_${Date.now()}.json`);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }, 1000);
+    }
+
+    function generateDocumentContent(format) {
+        const selectedTemplate = document.querySelector('input[name="template"]:checked').value;
+        let content = '';
+        
+        switch(selectedTemplate) {
+            case 'employment-contract':
+                content = `
+EMPLOYMENT CONTRACT
+===================
+
+Contract ID: ${fieldMapping['DOCUMENT:NUMBER']()}
+
+PARTIES:
+--------
+This Employment Contract is made between:
+
+Employer: [Company Name]
+Employee: ${fieldMapping['ENTERPRISE:EMPLOYEE:FULL_NAME']()}
+
+EMPLOYEE INFORMATION:
+--------------------
+Passport: ${fieldMapping['NATIONAL:RU:PASSPORT:SERIES']()} ${fieldMapping['NATIONAL:RU:PASSPORT:NUMBER']()}
+Tax ID (INN): ${fieldMapping['NATIONAL:RU:TAX:INN']()}
+Employee ID: ${fieldMapping['ENTERPRISE:EMPLOYEE:ID']()}
+Position: ${fieldMapping['ENTERPRISE:EMPLOYEE:POSITION']()}
+Department: ${fieldMapping['ENTERPRISE:EMPLOYEE:DEPARTMENT']()}
+
+COMPENSATION:
+-------------
+Base Salary: ${fieldMapping['ENTERPRISE:SALARY:BASE']()} ${fieldMapping['ENTERPRISE:SALARY:CURRENCY']()} per year
+
+TERMS AND CONDITIONS:
+---------------------
+[Standard employment terms here]
+
+Date: ${fieldMapping['DOCUMENT:DATE']()}
+Signature: _________________________
+
+Generated by DOCScoin Standard Document Generator
+`;
+                break;
+        }
+        
+        return content;
+    }
+
+    function generateCsvContent() {
+        return `Field,Value
+Global ID,${fieldMapping['GLOBAL:IDENTIFIER:GUID']()}
+Employee Name,${fieldMapping['ENTERPRISE:EMPLOYEE:FULL_NAME']()}
+Passport Series,${fieldMapping['NATIONAL:RU:PASSPORT:SERIES']()}
+Passport Number,${fieldMapping['NATIONAL:RU:PASSPORT:NUMBER']()}
+Tax ID,${fieldMapping['NATIONAL:RU:TAX:INN']()}
+Employee ID,${fieldMapping['ENTERPRISE:EMPLOYEE:ID']()}
+Position,${fieldMapping['ENTERPRISE:EMPLOYEE:POSITION']()}
+Department,${fieldMapping['ENTERPRISE:EMPLOYEE:DEPARTMENT']()}
+Salary,${fieldMapping['ENTERPRISE:SALARY:BASE']()}
+Currency,${fieldMapping['ENTERPRISE:SALARY:CURRENCY']()}
+Generated,${new Date().toISOString()}
+`;
+    }
+
+    function generateDOCScoinJson() {
+        return {
+            "$schema": "../specification/schemas/global-profile.json",
+            "version": "1.0.0",
+            "global_unique_id": fieldMapping['GLOBAL:IDENTIFIER:GUID'](),
+            "international_status": {
+                "verification_level": "ENHANCED",
+                "data_protection_level": ["GDPR"]
+            },
+            "national_data": {
+                "ru": {
+                    "passport": {
+                        "series": fieldMapping['NATIONAL:RU:PASSPORT:SERIES'](),
+                        "number": fieldMapping['NATIONAL:RU:PASSPORT:NUMBER']()
+                    },
+                    "inn": fieldMapping['NATIONAL:RU:TAX:INN']()
+                }
+            },
+            "enterprise_data": {
+                "employee": {
+                    "employee_id": fieldMapping['ENTERPRISE:EMPLOYEE:ID'](),
+                    "position": fieldMapping['ENTERPRISE:EMPLOYEE:POSITION']()
+                },
+                "compensation": {
+                    "base_salary": {
+                        "amount": parseFloat(fieldMapping['ENTERPRISE:SALARY:BASE']()),
+                        "currency": fieldMapping['ENTERPRISE:SALARY:CURRENCY']()
+                    }
+                }
+            },
+            "generated": new Date().toISOString(),
+            "generator": "DOCScoin Web Interface v1.0"
+        };
+    }
+
+    function showStatus(message, type = 'info') {
+        statusMessage.className = 'status-message';
+        
+        switch(type) {
+            case 'success':
+                statusMessage.style.background = '#d4edda';
+                statusMessage.style.color = '#155724';
+                statusMessage.style.borderColor = '#c3e6cb';
+                break;
+            case 'error':
+                statusMessage.style.background = '#f8d7da';
+                statusMessage.style.color = '#721c24';
+                statusMessage.style.borderColor = '#f5c6cb';
+                break;
+            case 'info':
+            default:
+                statusMessage.style.background = '#d1ecf1';
+                statusMessage.style.color = '#0c5460';
+                statusMessage.style.borderColor = '#bee5eb';
+        }
+        
+        statusText.textContent = message;
+        statusMessage.style.display = 'flex';
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            statusMessage.style.display = 'none';
+        }, 5000);
+    }
+});
