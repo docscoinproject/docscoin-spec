@@ -842,3 +842,116 @@ body {
 .fa-lightbulb {
     animation: bulb-flicker 2s infinite;
 }
+/* Dynamic Field Sections */
+.data-section {
+    margin-bottom: 30px;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border-left: 4px solid #0366d6;
+    transition: all 0.3s ease;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #24292e;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+}
+
+.section-title i {
+    color: #0366d6;
+    font-size: 1.5rem;
+}
+
+/* Country Chips for Multi-select */
+.multi-country-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.multi-country-option {
+    cursor: pointer;
+}
+
+.multi-country-option input[type="checkbox"] {
+    display: none;
+}
+
+.multi-country-option input[type="checkbox"]:checked + .country-chip {
+    background: #0366d6;
+    color: white;
+    border-color: #0366d6;
+}
+
+.country-chip {
+    display: inline-block;
+    padding: 8px 16px;
+    background: white;
+    border: 2px solid #e1e4e8;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.country-chip:hover {
+    border-color: #0366d6;
+    transform: translateY(-2px);
+}
+
+/* Input validation states */
+.input-group input:valid {
+    border-color: #28a745;
+}
+
+.input-group input:invalid:not(:placeholder-shown) {
+    border-color: #dc3545;
+}
+
+/* Required field indicator */
+.input-group label.required::after {
+    content: " *";
+    color: #dc3545;
+}
+
+/* Animation for section appearance */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.data-section[style*="display: block"] {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Country card selected state */
+.country-option input[type="radio"]:checked + .country-card {
+    border-color: #0366d6;
+    background: #f0f7ff;
+    box-shadow: 0 5px 15px rgba(3, 102, 214, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .data-section {
+        padding: 20px;
+    }
+    
+    .input-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .multi-country-grid {
+        justify-content: center;
+    }
+}

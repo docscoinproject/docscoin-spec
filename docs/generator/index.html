@@ -71,48 +71,102 @@
                     </div>
 
                     <!-- Step 2: Select Country (for National level) -->
-                    <div class="step" id="country-step" style="display: none;">
-                        <div class="step-header">
-                            <span class="step-number">2</span>
-                            <h3>Select Country</h3>
-                        </div>
-                        <div class="step-content">
-                            <div class="country-grid">
-                                <label class="country-option">
-                                    <input type="checkbox" name="country" value="ru">
-                                    <div class="country-card">
-                                        <span class="flag">🇷🇺</span>
-                                        <span class="country-name">Russia</span>
-                                        <small>ИНН, Паспорт, СНИЛС</small>
-                                    </div>
-                                </label>
-                                <label class="country-option">
-                                    <input type="checkbox" name="country" value="ua">
-                                    <div class="country-card">
-                                        <span class="flag">🇺🇦</span>
-                                        <span class="country-name">Ukraine</span>
-                                        <small>РНОКПП, Паспорт</small>
-                                    </div>
-                                </label>
-                                <label class="country-option">
-                                    <input type="checkbox" name="country" value="us">
-                                    <div class="country-card">
-                                        <span class="flag">🇺🇸</span>
-                                        <span class="country-name">USA</span>
-                                        <small>SSN, Driver License</small>
-                                    </div>
-                                </label>
-                                <label class="country-option">
-                                    <input type="checkbox" name="country" value="cn">
-                                    <div class="country-card">
-                                        <span class="flag">🇨🇳</span>
-                                        <span class="country-name">China</span>
-                                        <small>ID Card, Social Code</small>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
+					<div class="step" id="country-step">
+						<div class="step-header">
+							<span class="step-number">2</span>
+							<h3>Select Country/Jurisdiction</h3>
+						</div>
+						<div class="step-content">
+							<div class="country-grid">
+								<!-- Russia -->
+								<label class="country-option">
+									<input type="radio" name="country" value="ru" data-standard="national">
+									<div class="country-card" data-country="ru">
+										<span class="flag">🇷🇺</span>
+										<span class="country-name">Russia</span>
+										<small>Паспорт, ИНН, СНИЛС</small>
+									</div>
+								</label>
+								
+								<!-- Ukraine -->
+								<label class="country-option">
+									<input type="radio" name="country" value="ua" data-standard="national">
+									<div class="country-card" data-country="ua">
+										<span class="flag">🇺🇦</span>
+										<span class="country-name">Ukraine</span>
+										<small>Паспорт, РНОКПП</small>
+									</div>
+								</label>
+								
+								<!-- USA -->
+								<label class="country-option">
+									<input type="radio" name="country" value="us" data-standard="national">
+									<div class="country-card" data-country="us">
+										<span class="flag">🇺🇸</span>
+										<span class="country-name">USA</span>
+										<small>SSN, Driver License</small>
+									</div>
+								</label>
+								
+								<!-- China -->
+								<label class="country-option">
+									<input type="radio" name="country" value="cn" data-standard="national">
+									<div class="country-card" data-country="cn">
+										<span class="flag">🇨🇳</span>
+										<span class="country-name">China</span>
+										<small>ID Card, Social Code</small>
+									</div>
+								</label>
+								
+								<!-- India -->
+								<label class="country-option">
+									<input type="radio" name="country" value="in" data-standard="national">
+									<div class="country-card" data-country="in">
+										<span class="flag">🇮🇳</span>
+										<span class="country-name">India</span>
+										<small>Aadhaar, PAN</small>
+									</div>
+								</label>
+								
+								<!-- Multiple selection option -->
+								<label class="country-option">
+									<input type="radio" name="country" value="multiple" data-standard="national">
+									<div class="country-card" data-country="multiple">
+										<span class="flag">🌍</span>
+										<span class="country-name">Multiple</span>
+										<small>Combined jurisdictions</small>
+									</div>
+								</label>
+							</div>
+							
+							<!-- Multi-country selection (shown when "Multiple" is selected) -->
+							<div id="multi-country-select" style="display: none; margin-top: 20px;">
+								<h4 style="margin-bottom: 15px; color: #24292e;">Select Multiple Countries:</h4>
+								<div class="multi-country-grid">
+									<label class="multi-country-option">
+										<input type="checkbox" name="multi-country" value="ru">
+										<span class="country-chip">🇷🇺 Russia</span>
+									</label>
+									<label class="multi-country-option">
+										<input type="checkbox" name="multi-country" value="ua">
+										<span class="country-chip">🇺🇦 Ukraine</span>
+									</label>
+									<label class="multi-country-option">
+										<input type="checkbox" name="multi-country" value="us">
+										<span class="country-chip">🇺🇸 USA</span>
+									</label>
+									<label class="multi-country-option">
+										<input type="checkbox" name="multi-country" value="cn">
+										<span class="country-chip">🇨🇳 China</span>
+									</label>
+									<label class="multi-country-option">
+										<input type="checkbox" name="multi-country" value="in">
+										<span class="country-chip">🇮🇳 India</span>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
 
                     <!-- Step 3: Select Template -->
                     <div class="step">
@@ -163,53 +217,125 @@
                     </div>
 
                     <!-- Step 4: Data Input -->
-                    <div class="step">
-                        <div class="step-header">
-                            <span class="step-number">4</span>
-                            <h3>Enter Data</h3>
-                        </div>
-                        <div class="step-content">
-                            <div class="data-input">
-                                <div class="input-group">
-                                    <label for="employeeName">Full Name</label>
-                                    <input type="text" id="employeeName" placeholder="Ivan Ivanov">
-                                </div>
-                                <div class="input-row">
-                                    <div class="input-group">
-                                        <label for="passportSeries">Passport Series</label>
-                                        <input type="text" id="passportSeries" placeholder="1234">
-                                    </div>
-                                    <div class="input-group">
-                                        <label for="passportNumber">Passport Number</label>
-                                        <input type="text" id="passportNumber" placeholder="567890">
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <label for="inn">Tax ID (INN)</label>
-                                    <input type="text" id="inn" placeholder="770112345678">
-                                </div>
-                                <div class="input-row">
-                                    <div class="input-group">
-                                        <label for="position">Position</label>
-                                        <input type="text" id="position" placeholder="Senior Developer">
-                                    </div>
-                                    <div class="input-group">
-                                        <label for="salary">Salary</label>
-                                        <input type="number" id="salary" placeholder="85000">
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <label for="currency">Currency</label>
-                                    <select id="currency">
-                                        <option value="RUB">RUB - Russian Ruble</option>
-                                        <option value="UAH">UAH - Ukrainian Hryvnia</option>
-                                        <option value="USD" selected>USD - US Dollar</option>
-                                        <option value="EUR">EUR - Euro</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+					<div class="step">
+						<div class="step-header">
+							<span class="step-number">4</span>
+							<h3>Enter Data</h3>
+						</div>
+						<div class="step-content">
+							<!-- Common Global Fields -->
+							<div id="global-fields" class="data-section">
+								<h4 class="section-title"><i class="fas fa-globe"></i> Global Data</h4>
+								<div class="data-input">
+									<div class="input-group">
+										<label for="globalId">Global Identifier</label>
+										<input type="text" id="globalId" placeholder="Auto-generated GUID" readonly>
+									</div>
+								</div>
+							</div>
+							
+							<!-- Russia Fields -->
+							<div id="ru-fields" class="data-section" style="display: none;">
+								<h4 class="section-title"><i class="fas fa-flag"></i> Russian Federation Data</h4>
+								<div class="data-input">
+									<div class="input-row">
+										<div class="input-group">
+											<label for="ruPassportSeries">Паспорт серия</label>
+											<input type="text" id="ruPassportSeries" placeholder="1234" maxlength="4">
+										</div>
+										<div class="input-group">
+											<label for="ruPassportNumber">Паспорт номер</label>
+											<input type="text" id="ruPassportNumber" placeholder="567890" maxlength="6">
+										</div>
+									</div>
+									<div class="input-group">
+										<label for="ruINN">ИНН</label>
+										<input type="text" id="ruINN" placeholder="770112345678" maxlength="12">
+									</div>
+									<div class="input-group">
+										<label for="ruSNILS">СНИЛС</label>
+										<input type="text" id="ruSNILS" placeholder="123-456-789 00">
+									</div>
+								</div>
+							</div>
+							
+							<!-- Ukraine Fields -->
+							<div id="ua-fields" class="data-section" style="display: none;">
+								<h4 class="section-title"><i class="fas fa-flag"></i> Ukraine Data</h4>
+								<div class="data-input">
+									<div class="input-row">
+										<div class="input-group">
+											<label for="uaPassportSeries">Паспорт серія</label>
+											<input type="text" id="uaPassportSeries" placeholder="АБ" maxlength="2">
+										</div>
+										<div class="input-group">
+											<label for="uaPassportNumber">Паспорт номер</label>
+											<input type="text" id="uaPassportNumber" placeholder="123456" maxlength="6">
+										</div>
+									</div>
+									<div class="input-group">
+										<label for="uaTIN">РНОКПП (ІПН)</label>
+										<input type="text" id="uaTIN" placeholder="1234567890" maxlength="10">
+									</div>
+								</div>
+							</div>
+							
+							<!-- USA Fields -->
+							<div id="us-fields" class="data-section" style="display: none;">
+								<h4 class="section-title"><i class="fas fa-flag"></i> United States Data</h4>
+								<div class="data-input">
+									<div class="input-group">
+										<label for="usSSN">Social Security Number</label>
+										<input type="text" id="usSSN" placeholder="123-45-6789">
+									</div>
+									<div class="input-group">
+										<label for="usDriverLicense">Driver License</label>
+										<input type="text" id="usDriverLicense" placeholder="State + Number">
+									</div>
+								</div>
+							</div>
+							
+							<!-- Enterprise Fields (always shown for Enterprise/All) -->
+							<div id="enterprise-fields" class="data-section">
+								<h4 class="section-title"><i class="fas fa-building"></i> Enterprise Data</h4>
+								<div class="data-input">
+									<div class="input-group">
+										<label for="employeeName">Full Name</label>
+										<input type="text" id="employeeName" placeholder="Ivan Ivanov">
+									</div>
+									<div class="input-row">
+										<div class="input-group">
+											<label for="position">Position</label>
+											<input type="text" id="position" placeholder="Senior Developer">
+										</div>
+										<div class="input-group">
+											<label for="employeeId">Employee ID</label>
+											<input type="text" id="employeeId" placeholder="EMP-2025-001">
+										</div>
+									</div>
+									<div class="input-row">
+										<div class="input-group">
+											<label for="department">Department</label>
+											<input type="text" id="department" placeholder="Engineering">
+										</div>
+										<div class="input-group">
+											<label for="salary">Salary</label>
+											<input type="number" id="salary" placeholder="85000">
+										</div>
+									</div>
+									<div class="input-group">
+										<label for="currency">Currency</label>
+										<select id="currency">
+											<option value="RUB">RUB - Russian Ruble</option>
+											<option value="UAH">UAH - Ukrainian Hryvnia</option>
+											<option value="USD" selected>USD - US Dollar</option>
+											<option value="EUR">EUR - Euro</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
                 </section>
             </div>
 

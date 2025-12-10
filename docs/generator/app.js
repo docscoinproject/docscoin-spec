@@ -34,34 +34,101 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Field mapping configuration
     const fieldMapping = {
-        // Global fields
-        'GLOBAL:IDENTIFIER:GUID': () => sampleData.guid,
-        
-        // Russia fields
-        'NATIONAL:RU:PASSPORT:SERIES': () => sampleData.passportSeries,
-        'NATIONAL:RU:PASSPORT:NUMBER': () => sampleData.passportNumber,
-        'NATIONAL:RU:TAX:INN': () => sampleData.inn,
-        
-        // Ukraine fields
-        'NATIONAL:UA:PASSPORT:SERIES': () => "АБ",
-        'NATIONAL:UA:PASSPORT:NUMBER': () => "123456",
-        'NATIONAL:UA:TAX:TIN': () => "1234567890",
-        
-        // Enterprise fields
-        'ENTERPRISE:EMPLOYEE:FULL_NAME': () => sampleData.employeeName,
-        'ENTERPRISE:EMPLOYEE:ID': () => sampleData.employeeId,
-        'ENTERPRISE:EMPLOYEE:POSITION': () => sampleData.position,
-        'ENTERPRISE:SALARY:BASE': () => sampleData.salary,
-        'ENTERPRISE:SALARY:CURRENCY': () => sampleData.currency,
-        'ENTERPRISE:EMPLOYEE:DEPARTMENT': () => sampleData.department,
-        
-        // Document fields
-        'DOCUMENT:DATE': () => new Date().toISOString().split('T')[0],
-        'DOCUMENT:NUMBER': () => `DOC-${Date.now().toString().slice(-6)}`
-    };
+		// Global fields
+		'GLOBAL:IDENTIFIER:GUID': () => document.getElementById('globalId').value || generateUUID(),
+		
+		// Russia fields
+		'NATIONAL:RU:PASSPORT:SERIES': () => document.getElementById('ruPassportSeries').value,
+		'NATIONAL:RU:PASSPORT:NUMBER': () => document.getElementById('ruPassportNumber').value,
+		'NATIONAL:RU:TAX:INN': () => document.getElementById('ruINN').value,
+		'NATIONAL:RU:SOCIAL:SNILS': () => document.getElementById('ruSNILS').value,
+		
+		// Ukraine fields
+		'NATIONAL:UA:PASSPORT:SERIES': () => document.getElementById('uaPassportSeries').value,
+		'NATIONAL:UA:PASSPORT:NUMBER': () => document.getElementById('uaPassportNumber').value,
+		'NATIONAL:UA:TAX:TIN': () => document.getElementById('uaTIN').value,
+		
+		// USA fields
+		'NATIONAL:US:TAX:SSN': () => document.getElementById('usSSN').value,
+		'NATIONAL:US:IDENTITY:DRIVER_LICENSE': () => document.getElementById('usDriverLicense').value,
+		
+		// Enterprise fields
+		'ENTERPRISE:EMPLOYEE:FULL_NAME': () => document.getElementById('employeeName').value,
+		'ENTERPRISE:EMPLOYEE:ID': () => document.getElementById('employeeId').value,
+		'ENTERPRISE:EMPLOYEE:POSITION': () => document.getElementById('position').value,
+		'ENTERPRISE:SALARY:BASE': () => document.getElementById('salary').value,
+		'ENTERPRISE:SALARY:CURRENCY': () => document.getElementById('currency').value,
+		'ENTERPRISE:EMPLOYEE:DEPARTMENT': () => document.getElementById('department').value,
+		
+		// Document fields
+		'DOCUMENT:DATE': () => new Date().toISOString().split('T')[0],
+		'DOCUMENT:NUMBER': () => `DOC-${Date.now().toString().slice(-6)}`
+	};
 
     // Initialize
     init();
+	
+	function updateFieldSections() {
+		const selectedStandard = document.querySelector('input[name="standard"]:checked').value;
+		const selectedCountry = document.querySelector('input[name="country"]:checked')?.value;
+		
+		// Всегда показываем глобальные и enterprise поля
+		document.getElementById('global-fields').style.display = 'block';
+		
+		// Показываем/скрываем страны в зависимости от стандарта
+		if (selectedStandard === 'national' || selectedStandard === 'all') {
+			document.getElementById('country-step').style.display = 'block';
+			
+			// Показываем поля для выбранной страны
+			const allCountryFields = ['ru-fields', 'ua-fields', 'us-fields', 'cn-fields', 'in-fields'];
+			allCountryFields.forEach(id => {
+				document.getElementById(id).style.display = 'none';
+			});
+			
+			if (selectedCountry === 'multiple') {
+				// Показываем мульти-выбор
+				document.getElementById('multi-country-select').style.display = 'block';
+				
+				// Показываем все выбранные страны
+				const multiCountries = document.querySelectorAll('input[name="multi-country"]:checked');
+				multiCountries.forEach(checkbox => {
+					const countryId = checkbox.value + '-fields';
+					if (document.getElementById(countryId)) {
+						document.getElementById(countryId).style.display = 'block';
+					}
+				});
+			} else if (selectedCountry && selectedCountry !== 'multiple') {
+				document.getElementById('multi-country-select').style.display = 'none';
+				const countryFields = document.getElementById(selectedCountry + '-fields');
+				if (countryFields) {
+					countryFields.style.display = 'block';
+				}
+			}
+		} else {
+			document.getElementById('country-step').style.display = 'none';
+			document.getElementById('multi-country-select').style.display = 'none';
+			
+			// Скрываем все национальные поля
+			['ru-fields', 'ua-fields', 'us-fields', 'cn-fields', 'in-fields'].forEach(id => {
+				document.getElementById(id).style.display = 'none';
+			});
+		}
+		
+		// Enterprise поля показываем для Enterprise и All
+		if (selectedStandard === 'enterprise' || selectedStandard === 'all') {
+			document.getElementById('enterprise-fields').style.display = 'block';
+		} else {
+			document.getElementById('enterprise-fields').style.display = 'none';
+		}
+	}
+
+	function generateUUID() {
+		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+			const r = Math.random() * 16 | 0;
+			const v = c === 'x' ? r : (r & 0x3 | 0x8);
+			return v.toString(16);
+		});
+	}
 
     function init() {
         // Event Listeners
@@ -98,20 +165,42 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initial preview
         updatePreview();
         updateFieldStatus();
-    }
+		
+		// Новые обработчики
+		standardRadios.forEach(radio => {
+			radio.addEventListener('change', function() {
+				handleStandardChange();
+				updateFieldSections();
+			});
+		});
+		
+		countryCheckboxes.forEach(checkbox => {
+			checkbox.addEventListener('change', function() {
+				updateFieldSections();
+				updatePreview();
+			});
+		});
+		
+		// Инициализация UUID
+		document.getElementById('globalId').value = generateUUID();
+		
+		// Инициализация полей
+		updateFieldSections();
+	}
 
-    function handleStandardChange() {
-        const selectedStandard = document.querySelector('input[name="standard"]:checked').value;
-        
-        // Show/hide country selection based on standard
-        if (selectedStandard === 'national' || selectedStandard === 'all') {
-            countryStep.style.display = 'block';
-        } else {
-            countryStep.style.display = 'none';
-        }
-        
-        updatePreview();
-    }
+	function handleStandardChange() {
+		const selectedStandard = document.querySelector('input[name="standard"]:checked').value;
+		
+		if (selectedStandard === 'national' || selectedStandard === 'all') {
+			document.getElementById('country-step').style.display = 'block';
+			// Выбираем первую страну по умолчанию
+			document.querySelector('input[name="country"][value="ru"]').checked = true;
+		} else {
+			document.getElementById('country-step').style.display = 'none';
+		}
+		
+		updateFieldSections();
+	}
 
     function handleTemplateChange() {
         const selectedTemplate = document.querySelector('input[name="template"]:checked').value;
@@ -548,23 +637,58 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Generation functions
     function generatePdf() {
-        showStatus('Generating PDF document...', 'info');
-        
-        // In a real implementation, this would call a backend or use a library like jsPDF
-        setTimeout(() => {
-            showStatus('PDF generated successfully!', 'success');
-            
-            // Create a dummy download
-            const element = document.createElement('a');
-            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + 
-                encodeURIComponent('This would be a PDF file in a real implementation'));
-            element.setAttribute('download', `DOCScoin_Contract_${Date.now()}.pdf`);
-            element.style.display = 'none';
-            document.body.appendChild(element);
-            element.click();
-            document.body.removeChild(element);
-        }, 1500);
-    }
+		showStatus('Generating PDF document...', 'info');
+		
+		// В реальном проекте здесь был бы jsPDF
+		// Но для демо создадим правильный текстовый файл
+		
+		const content = generateDocumentContent('pdf');
+		const selectedTemplate = document.querySelector('input[name="template"]:checked').value;
+		const templateNames = {
+			'employment-contract': 'Employment_Contract',
+			'pay-slip': 'Pay_Slip', 
+			'id-card': 'ID_Card',
+			'presentation': 'Presentation'
+		};
+		
+		setTimeout(() => {
+			showStatus('PDF document generated successfully!', 'success');
+			
+			// Создаем текстовый файл (в реальности был бы PDF)
+			const element = document.createElement('a');
+			const filename = `DOCScoin_${templateNames[selectedTemplate]}_${Date.now()}.txt`;
+			
+			// Добавим заголовок что это демо-версия
+			const demoContent = `============================================
+	DOCScoin Document - DEMO VERSION
+	============================================
+	Note: In a production environment, this would be a real PDF file
+	generated using jsPDF library with proper formatting.
+
+	============================================
+	DOCUMENT CONTENT:
+	============================================
+
+	${content}
+
+	============================================
+	METADATA:
+	============================================
+	Generated: ${new Date().toISOString()}
+	Template: ${selectedTemplate}
+	Standard: DOCScoin v1.0.0
+	Generator: Web Interface Demo
+	============================================`;
+
+			element.setAttribute('href', 'data:text/plain;charset=utf-8,' + 
+				encodeURIComponent(demoContent));
+			element.setAttribute('download', filename);
+			element.style.display = 'none';
+			document.body.appendChild(element);
+			element.click();
+			document.body.removeChild(element);
+		}, 1500);
+	}
 
     function generateDoc() {
         showStatus('Generating Word document...', 'info');

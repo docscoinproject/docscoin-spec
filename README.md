@@ -3,110 +3,201 @@
 
 [![License: CC BY 4.0](https://img.shields.io/badge/Docs-CC%20BY%204.0-blue.svg)](https://creativecommons.org/licenses/by/4.0/)
 [![License: Apache 2.0](https://img.shields.io/badge/Code-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen.svg)](https://docscoinproject.github.io/docscoin-spec/)
+[![GitHub Issues](https://img.shields.io/github/issues/docscoinproject/docscoin-spec?color=blue&label=Issues&logo=github)](https://github.com/docscoinproject/docscoin-spec/issues)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/docscoinproject/docscoin-spec/blob/main/governance/CONTRIBUTING.md)
 
-## 🎯 Vision
+## 🚀 Live Demo & Quick Start
 
-To create a universal, interoperable standard for document management that combines:
-- **Structured data** (SQL-like organization)
-- **Blockchain audit trails** (immutable access logs) 
-- **Multi-level security** (global, national, enterprise)
-- **Legal compliance** (GDPR, ФЗ-152, CCPA ready)
+### 🌐 **Live Website**
+**[https://docscoinproject.github.io/docscoin-spec/](https://docscoinproject.github.io/docscoin-spec/)**
 
-## 🏗️ Three-Tier Architecture
+| Page | Description | Direct Link |
+|------|-------------|-------------|
+| 📄 **Home** | Main portal with navigation | [Home](https://docscoinproject.github.io/docscoin-spec/) |
+| 🛠️ **Document Generator** | Interactive document creation | [Generator](https://docscoinproject.github.io/docscoin-spec/generator/) |
+| 📚 **Documentation** | Complete specifications | [Documentation](https://docscoinproject.github.io/docscoin-spec/documentation.html) |
+| 💡 **Philosophy** | The story behind standards | [Philosophy](https://docscoinproject.github.io/docscoin-spec/philosophy.html) |
 
-| Level | Scope | Key Features |
-|-------|-------|--------------|
-| **🌍 Global** | International | UUID identifiers, biometric hashes, cross-border consent |
-| **🇷🇺🇺🇦 National** | Country-specific | Passport data, tax IDs, military records (RU/UA/US/CN/IN supported) |
-| **🏢 Enterprise** | Organization | Employee data, compensation, access control, industry extensions |
+### 💻 **Local Development**
+```bash
+# Clone repository
+git clone https://github.com/docscoinproject/docscoin-spec.git
+cd docscoin-spec
 
-## 📚 Quick Navigation
+# Explore structure
+ls -la
 
-### Specification Documents
-- **[Global Level](specification/01-global-level.md)** - International standards and identifiers
-- **[National Level](specification/02-national-level.md)** - Country-specific fields (RU, UA, US, CN, IN)
-- **[Enterprise Level](specification/03-enterprise-level.md)** - Organizational and HR data
-- **[Field Mapping](field-mapping.md)** - Cross-jurisdiction field comparison
+# Run Python tools
+python tools/validator.py examples/basic-profile.json
+python tools/document-generator.py --data examples/basic-profile.json
+```
 
-### Examples & Tutorials
-- **[Basic Profile](examples/basic-profile.json)** - Complete example with all three levels
-- **[RU/UA Dual Citizenship](examples/ru-ua-profile.json)** - Handling multiple nationalities
+## 🏗️ Architecture Overview
+DOCScoin uses a three-tier architecture for maximum flexibility and compliance:
+| Level | Scope | Key Features | Example Fields |
+|-------|-------|--------------|----------------|
+|🌍 Global |International|UUIDs, biometric hashes, cross-border consent|global_unique_id, biometric_reference|
+|🇷🇺🇺🇦 National|Country-specific|Local regulations, tax IDs, passports|passport_series, inn, tin|
+|🏢 Enterprise|Organizational|HR data, compensation, access control|employee_id, salary, department|
 
-### Governance & Contribution
-- **[Contribution Guide](governance/CONTRIBUTING.md)** - How to contribute to the project
-- **[Governance Model](governance/GOVERNANCE.md)** - Project structure and decision making
-- **[Code of Conduct](CODE_OF_CONDUCT.md)** - Community behavior guidelines
-- **[Changelog](CHANGELOG.md)** - Version history and changes
+## 📁 Repository Structure
+```text
+docscoin-spec/
+├── 📂 docs/                    # GitHub Pages website
+│   ├── index.html            # Main portal
+│   ├── generator/            # Web interface
+│   ├── documentation.html    # Documentation hub
+│   └── philosophy.html       # Philosophy of standards
+├── 📂 specification/          # Core specifications
+│   ├── 01-global-level.md    # International standards
+│   ├── 02-national-level.md  # Country-specific (RU/UA/US/CN/IN)
+│   ├── 03-enterprise-level.md # Organizational data
+│   └── template-fields-registry.md # Template field codes
+├── 📂 examples/              # Implementation examples
+│   ├── basic-profile.json    # Complete example
+│   └── ru-ua-profile.json    # Dual citizenship example
+├── 📂 tools/                 # Development tools
+│   ├── validator.py          # JSON validation
+│   ├── document-generator.py # Python generator
+│   └── create_database.py    # SQLite setup
+├── 📂 governance/            # Project management
+│   ├── CONTRIBUTING.md       # How to contribute
+│   └── GOVERNANCE.md         # Project governance
+└── 📂 .github/               # GitHub automation
+    └── ISSUE_TEMPLATE/      # Issue templates
+```
 
-### Tools & Utilities
-- **[JSON Schemas](specification/schemas/)** - Validation schemas
+## 🔧 Key Features
+
+### ✅ Privacy & Security
+- AES-256-GCM encryption for sensitive data
+- SHA3-256 hashed biometric references
+- GDPR/CCPA/ФЗ-152 compliant by design
+- Blockchain audit trails for document access
+
+### ✅ Multi-Jurisdiction Support
+- Russia: Паспорт, ИНН, СНИЛС, военный учет
+- Ukraine: Паспорт, РНОКПП, ЄДРПОУ, Дія
+- USA: SSN, Driver License, ITIN
+- China: ID Card, Social Credit Code
+- India: Aadhaar, PAN, Voter ID
+
+### ✅ Document Generation
+- Web Interface: Interactive document builder
+- Multiple Formats: PDF, Word, Excel, JSON export
+- Template System: Field-based template registry
+- Real-time Preview: WYSIWYG editor with live updates
 
 ## 🚀 Getting Started
 
 ### For Users
-1. **Browse examples** in the [`examples/`](examples/) directory
-2. **Read specifications** starting with [Global Level](specification/01-global-level.md)
-3. **Try validation** with our JSON schemas
+1. Visit  [Live Website](https://docscoinproject.github.io/docscoin-spec/)
+2. Try [Document Generator](https://docscoinproject.github.io/docscoin-spec/generator/)
+3. Read [Documentation](https://docscoinproject.github.io/docscoin-spec/documentation.html)
 
 ### For Developers
 ```bash
-# Clone the repository
-git clone https://github.com/docscoinproject/docscoin-spec.git
-cd docscoin-spec
+# 1. Validate JSON data
+python tools/validator.py examples/basic-profile.json
+
+# 2. Generate documents
+python tools/document-generator.py --data examples/basic-profile.json --output-dir my_docs
+
+# 3. Create database
+python tools/create_database.py
 ```
-### For Organizations
-1. Review compliance with your local regulations
-2. Check industry extensions in Enterprise Level
-3. Contact us about implementation consulting
 
-## 🔐 Key Features
+### For Contributors
+1. Read [CONTRIBUTING.md](https://governance/CONTRIBUTING.md)
+2. Check [open issues](https://github.com/docscoinproject/docscoin-spec/issues)
+3. Join [discussions](https://github.com/docscoinproject/docscoin-spec/discussions)
 
-### Privacy by Design
-- ✅ Encrypted identifiers (AES-256-GCM)
-- ✅ Hashed biometric references (SHA3-256)
-- ✅ Consent management per jurisdiction
-- ✅ Data minimization principles
+## 📚 Documentation Links
 
-### Legal Compliance
-- ✅ Russia: ФЗ-152, ГОСТ Р 52633.1-2016
-- ✅ Ukraine: ЗУ "Про захист персональних даних"
-- ✅ EU: GDPR, eIDAS compatibility
-- ✅ US: CCPA, HIPAA considerations
-- ✅ China: PIPL, GB/T 35273 support
+### Core Specifications
+- [Global Level Specification](https://specification/01-global-level.md)
+- [National Level Specification](https://specification/02-national-level.md)
+- [Enterprise Level Specification](https://specification/03-enterprise-level.md)
+- [Template Fields Registry](https://specification/template-fields-registry.md)
 
-### 🌍 Supported Jurisdictions
-| Country | Status | Key | Identifiers |
-|---------|--------|-----|-------------|
-| 🇷🇺 | Russia | Full | Паспорт, ИНН, СНИЛС, Военный билет |
-| 🇺🇦 | Ukraine |	 Full | Паспорт, РНОКПП, ЄДРПОУ, Дія |
-| 🇺🇸 | USA | Partial | SSN, Driver License, ITIN |
-| 🇨🇳 | China | Partial |	ID Card, Social Credit Code |
-| 🇮🇳 | India | Basic | Aadhaar, PAN, Voter ID |
-| 🇪🇺 | EU | Reference | eIDAS, National eIDs |
+### Examples
+- [Basic Profile Example](https://examples/basic-profile.json)
+- [RU/UA Dual Citizenship](https://examples/ru-ua-profile.json)
 
-## 📞 Contact & Community
+### Tools
+- [JSON Validator](https://tools/validator.py)
+- [Document Generator (Python)](https://tools/document-generator.py)
+- [Database Creator](https://tools/create_database.py)
 
-### 🐛 Report Issues & Request Features
-[![GitHub Issues](https://img.shields.io/github/issues/docscoinproject/docscoin-spec?color=blue&label=Issues&logo=github)](https://github.com/docscoinproject/docscoin-spec/issues)
+## 🌍 Use Cases
 
-GitHub Issues - для багов и запросов функций:
+### 🏦 Cross-Border Banking
+```json
+"Russian passport + Ukrainian TIN + EU GDPR compliance in single profile"
+```
 
-- 🐞 [Report a bug](https://github.com/docscoinproject/docscoin-spec/issues/new?template=bug_report.md) 
+### 💼 International Employment 
+```json
+"US SSN + Chinese work permit + corporate HR data with proper jurisdictional separation"
+```
 
-- 💡 [Request a feature](https://github.com/docscoinproject/docscoin-spec/issues/new?template=feature_request.md)
+### 🏛️ Government Services
+```json
+"Digital identity verification without exposing raw personal data"
+```
 
-GitHub Discussions - для обсуждений:
+## 🤝 Community & Contribution
 
-- 💬 [Join Discussions](https://github.com/docscoinproject/docscoin-spec/discussions)
+### 📞 Contact & Support
+- Issues: [Report bugs or request features](https://github.com/docscoinproject/docscoin-spec/issues)
+- Discussions: [Join community discussions](https://github.com/docscoinproject/docscoin-spec/discussions)
+- Security: [Private vulnerability reporting](https://github.com/docscoinproject/docscoin-spec/security/advisories)
 
-### 👥 Community Participation
-1. Watch репозиторий (↑ сверху) - получайте уведомления
-2. Star ⭐ проект - покажите поддержку
-3. Fork 🍴 - создайте свою копию для экспериментов
+### 👥 How to Contribute
+- Fork the repository
+- Create a feature branch
+- Make your changes
+- Submit a Pull Request
 
-## 📄 License & Attribution
-- **Our work**: Licensed under Apache 2.0 (code) and CC BY 4.0 (docs)
-- **References**: We reference but do not copy proprietary standards
-- **Compliance**: All external references are properly attributed
+See our detailed [Contribution Guide.](https://governance/CONTRIBUTING.md)
 
-### DOCScoin Standard v0.1.0 • [View Changelog](https://changelog.md/)
+## 🎯 Areas Needing Help
+- Additional country implementations
+- More document templates
+- Translation to other languages
+- Security audit and testing
+
+## 📊 Project Status
+| Component |	Status | Version |
+|-----------|----------|---------|
+|Specification	|✅ Stable	|v1.0.0|
+|Web Interface	|✅ Live	|v1.0.0|
+|Python Tools	|✅ Functional	|v0.1.0|
+|Documentation	|✅ Complete	|v1.0.0|
+|Community	|🟡| Growing|
+
+## 📄 License
+- Documentation: [Creative Commons Attribution 4.0 International](https://license.md/#documentation)
+- Code: [Apache License 2.0](https://license.md/#code)
+- Trademarks: "DOCScoin" is a project trademark	
+
+## 🙏 Acknowledgments
+This project stands on the shoulders of giants:
+
+Historical Inspiration
+
+> *"We don't remember the names of engineers who standardized the electrical socket in 1909, but every evening we turn on lights using their work."*
+
+## Modern Tools
+- DeepSeek AI: Free AI assistant used in development
+- GitHub: Free hosting for open source projects
+- Open Standards Community: Decades of interoperability work
+
+## Special Thanks
+To all open source maintainers whose work makes projects like this possible.
+
+## 📢 Star this repository if you find it useful! ⭐
+🌐 Live Demo: [https://docscoinproject.github.io/docscoin-spec/](https://docscoinproject.github.io/docscoin-spec/)
+🐛 Report Issues: [GitHub Issues](https://github.com/docscoinproject/docscoin-spec/issues)
+💬 Join Discussion: [GitHub Discussions](https://github.com/docscoinproject/docscoin-spec/discussions)
