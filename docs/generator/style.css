@@ -955,3 +955,20 @@ body {
         justify-content: center;
     }
 }
+
+/* Стили для полей Китая и Индии */
+#cn-fields {
+    border-left-color: #d73a49; /* Красный для Китая */
+}
+
+#cn-fields .section-title i {
+    color: #d73a49;
+}
+
+#in-fields {
+    border-left-color: #ff9800; /* Оранжевый для Индии */
+}
+
+#in-fields .section-title i {
+    color: #ff9800;
+}

@@ -52,6 +52,14 @@ document.addEventListener('DOMContentLoaded', function() {
 		'NATIONAL:US:TAX:SSN': () => document.getElementById('usSSN').value,
 		'NATIONAL:US:IDENTITY:DRIVER_LICENSE': () => document.getElementById('usDriverLicense').value,
 		
+		// China fields
+		'NATIONAL:CN:ID:CARD': () => document.getElementById('cnIDCard')?.value || '',
+		'NATIONAL:CN:SOCIAL:CREDIT_CODE': () => document.getElementById('cnSocialCredit')?.value || '',
+
+		// India fields  
+		'NATIONAL:IN:IDENTITY:AADHAAR': () => document.getElementById('inAadhaar')?.value || '',
+		'NATIONAL:IN:TAX:PAN': () => document.getElementById('inPAN')?.value || '',
+		
 		// Enterprise fields
 		'ENTERPRISE:EMPLOYEE:FULL_NAME': () => document.getElementById('employeeName').value,
 		'ENTERPRISE:EMPLOYEE:ID': () => document.getElementById('employeeId').value,
@@ -72,53 +80,60 @@ document.addEventListener('DOMContentLoaded', function() {
 		const selectedStandard = document.querySelector('input[name="standard"]:checked').value;
 		const selectedCountry = document.querySelector('input[name="country"]:checked')?.value;
 		
-		// Всегда показываем глобальные и enterprise поля
-		document.getElementById('global-fields').style.display = 'block';
+		// Всегда показываем глобальные поля
+		const globalFields = document.getElementById('global-fields');
+		if (globalFields) globalFields.style.display = 'block';
 		
 		// Показываем/скрываем страны в зависимости от стандарта
+		const countryStep = document.getElementById('country-step');
+		const multiCountrySelect = document.getElementById('multi-country-select');
+		
 		if (selectedStandard === 'national' || selectedStandard === 'all') {
-			document.getElementById('country-step').style.display = 'block';
+			if (countryStep) countryStep.style.display = 'block';
 			
-			// Показываем поля для выбранной страны
+			// Скрываем все национальные поля сначала
 			const allCountryFields = ['ru-fields', 'ua-fields', 'us-fields', 'cn-fields', 'in-fields'];
 			allCountryFields.forEach(id => {
-				document.getElementById(id).style.display = 'none';
+				const element = document.getElementById(id);
+				if (element) element.style.display = 'none';
 			});
 			
 			if (selectedCountry === 'multiple') {
 				// Показываем мульти-выбор
-				document.getElementById('multi-country-select').style.display = 'block';
+				if (multiCountrySelect) multiCountrySelect.style.display = 'block';
 				
 				// Показываем все выбранные страны
 				const multiCountries = document.querySelectorAll('input[name="multi-country"]:checked');
 				multiCountries.forEach(checkbox => {
 					const countryId = checkbox.value + '-fields';
-					if (document.getElementById(countryId)) {
-						document.getElementById(countryId).style.display = 'block';
-					}
+					const element = document.getElementById(countryId);
+					if (element) element.style.display = 'block';
 				});
 			} else if (selectedCountry && selectedCountry !== 'multiple') {
-				document.getElementById('multi-country-select').style.display = 'none';
+				if (multiCountrySelect) multiCountrySelect.style.display = 'none';
 				const countryFields = document.getElementById(selectedCountry + '-fields');
-				if (countryFields) {
-					countryFields.style.display = 'block';
-				}
+				if (countryFields) countryFields.style.display = 'block';
 			}
 		} else {
-			document.getElementById('country-step').style.display = 'none';
-			document.getElementById('multi-country-select').style.display = 'none';
+			if (countryStep) countryStep.style.display = 'none';
+			if (multiCountrySelect) multiCountrySelect.style.display = 'none';
 			
 			// Скрываем все национальные поля
-			['ru-fields', 'ua-fields', 'us-fields', 'cn-fields', 'in-fields'].forEach(id => {
-				document.getElementById(id).style.display = 'none';
+			const allCountryFields = ['ru-fields', 'ua-fields', 'us-fields', 'cn-fields', 'in-fields'];
+			allCountryFields.forEach(id => {
+				const element = document.getElementById(id);
+				if (element) element.style.display = 'none';
 			});
 		}
 		
 		// Enterprise поля показываем для Enterprise и All
-		if (selectedStandard === 'enterprise' || selectedStandard === 'all') {
-			document.getElementById('enterprise-fields').style.display = 'block';
-		} else {
-			document.getElementById('enterprise-fields').style.display = 'none';
+		const enterpriseFields = document.getElementById('enterprise-fields');
+		if (enterpriseFields) {
+			if (selectedStandard === 'enterprise' || selectedStandard === 'all') {
+				enterpriseFields.style.display = 'block';
+			} else {
+				enterpriseFields.style.display = 'none';
+			}
 		}
 	}
 
@@ -167,13 +182,36 @@ document.addEventListener('DOMContentLoaded', function() {
         updateFieldStatus();
 		
 		// Новые обработчики
+		
+		// Обработчики для стандартов
 		standardRadios.forEach(radio => {
 			radio.addEventListener('change', function() {
+				console.log('Standard changed to:', this.value);
 				handleStandardChange();
 				updateFieldSections();
+				updatePreview();
 			});
 		});
 		
+		// Обработчики для стран
+		const countryRadios = document.querySelectorAll('input[name="country"]');
+		countryRadios.forEach(radio => {
+			radio.addEventListener('change', function() {
+				console.log('Country changed to:', this.value);
+				updateFieldSections();
+				updatePreview();
+			});
+		});
+		
+		// Обработчики для мульти-выбора стран
+		const multiCountryCheckboxes = document.querySelectorAll('input[name="multi-country"]');
+		multiCountryCheckboxes.forEach(checkbox => {
+			checkbox.addEventListener('change', function() {
+				updateFieldSections();
+				updatePreview();
+			});
+		});
+	
 		countryCheckboxes.forEach(checkbox => {
 			checkbox.addEventListener('change', function() {
 				updateFieldSections();
@@ -535,14 +573,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updatePreview() {
-        // Get current form values
-        sampleData.employeeName = document.getElementById('employeeName').value || sampleData.employeeName;
-        sampleData.passportSeries = document.getElementById('passportSeries').value || sampleData.passportSeries;
-        sampleData.passportNumber = document.getElementById('passportNumber').value || sampleData.passportNumber;
-        sampleData.inn = document.getElementById('inn').value || sampleData.inn;
-        sampleData.position = document.getElementById('position').value || sampleData.position;
-        sampleData.salary = document.getElementById('salary').value || sampleData.salary;
-        sampleData.currency = document.getElementById('currency').value || sampleData.currency;
+        function updatePreview() {
+		// Безопасное получение значений из полей
+		const safeGetValue = (id, defaultValue = '') => {
+			const element = document.getElementById(id);
+			return element ? element.value || defaultValue : defaultValue;
+		};
+		
+		// Обновляем sampleData безопасно
+		sampleData.employeeName = safeGetValue('employeeName', sampleData.employeeName);
+		sampleData.passportSeries = safeGetValue('ruPassportSeries', sampleData.passportSeries);
+		sampleData.passportNumber = safeGetValue('ruPassportNumber', sampleData.passportNumber);
+		sampleData.inn = safeGetValue('ruINN', sampleData.inn);
+		sampleData.position = safeGetValue('position', sampleData.position);
+		sampleData.salary = safeGetValue('salary', sampleData.salary);
+		sampleData.currency = safeGetValue('currency', sampleData.currency);
+		sampleData.employeeId = safeGetValue('employeeId', sampleData.employeeId);
+		sampleData.department = safeGetValue('department', sampleData.department);
+		
+		// Обновляем GUID если поле существует
+		const globalIdField = document.getElementById('globalId');
+		if (globalIdField && !globalIdField.value) {
+			globalIdField.value = generateUUID();
+		}
         
         // Update all placeholders in the document
         const placeholders = documentPreview.querySelectorAll('.placeholder');
