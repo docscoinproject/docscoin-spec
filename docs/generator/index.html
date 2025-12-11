@@ -451,6 +451,55 @@
                                 <i class="fas fa-code"></i> Export as JSON
                             </button>
                         </div>
+						
+						<div class="request-section">
+							<h3><i class="fas fa-exchange-alt"></i> Система заявок</h3>
+							<p class="section-description">
+								Создавайте зашифрованные заявки на данные или закрывайте существующие через блокчейн
+							</p>
+							
+							<div class="request-buttons">
+								<button id="generatePwid" class="request-btn">
+									<i class="fas fa-file-export"></i> Создать заявку (.pwid)
+								</button>
+								<button id="closeRequestBtnGlobal" class="request-btn secondary">
+									<i class="fas fa-file-import"></i> Закрыть заявку
+								</button>
+								<button id="viewRequestsBtn" class="request-btn tertiary">
+									<i class="fas fa-history"></i> История заявок
+								</button>
+							</div>
+							
+							<div class="request-stats">
+								<div class="stat-card">
+									<div class="stat-icon">
+										<i class="fas fa-clock"></i>
+									</div>
+									<div class="stat-content">
+										<div class="stat-value" id="pendingRequests">0</div>
+										<div class="stat-label">Ожидают</div>
+									</div>
+								</div>
+								<div class="stat-card">
+									<div class="stat-icon">
+										<i class="fas fa-check-circle"></i>
+									</div>
+									<div class="stat-content">
+										<div class="stat-value" id="closedRequests">0</div>
+										<div class="stat-label">Закрыто</div>
+									</div>
+								</div>
+								<div class="stat-card">
+									<div class="stat-icon">
+										<i class="fas fa-link"></i>
+									</div>
+									<div class="stat-content">
+										<div class="stat-value" id="blockchainTx">0</div>
+										<div class="stat-label">В блокчейне</div>
+									</div>
+								</div>
+							</div>
+						</div>
 
                         <!-- Status Messages -->
                         <div class="status-area">
@@ -505,5 +554,322 @@
 
     <!-- JavaScript -->
     <script src="app.js"></script>
+	
+	<!-- Модальное окно: Создать заявку -->
+<div id="createRequestModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-file-export"></i> Создать заявку на данные</h3>
+            <button class="close-modal">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <!-- Шаг 1: Авторизация -->
+            <div id="authStep" class="request-step active">
+                <h4>1. Авторизация работодателя</h4>
+                
+                <div class="auth-methods">
+                    <div class="auth-tabs">
+                        <button class="auth-tab active" data-tab="certificate">Сертификат</button>
+                        <button class="auth-tab" data-tab="login">Логин/Пароль</button>
+                    </div>
+                    
+                    <!-- Сертификат -->
+                    <div id="certificateAuth" class="auth-content active">
+                        <div class="input-group">
+                            <label for="certificateFile">
+                                <i class="fas fa-certificate"></i> Загрузите сертификат (.pem/.cer)
+                            </label>
+                            <input type="file" id="certificateFile" accept=".pem,.cer,.crt">
+                            <small class="help-text">Публичный ключ для шифрования данных</small>
+                        </div>
+                        
+                        <div class="certificate-preview" id="certificatePreview" style="display: none;">
+                            <h5>Информация о сертификате:</h5>
+                            <pre id="certificateInfo"></pre>
+                        </div>
+                    </div>
+                    
+                    <!-- Логин/Пароль -->
+                    <div id="loginAuth" class="auth-content">
+                        <div class="input-group">
+                            <label for="employerLogin">
+                                <i class="fas fa-user"></i> Логин работодателя
+                            </label>
+                            <input type="text" id="employerLogin" placeholder="company_123">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="employerPassword">
+                                <i class="fas fa-lock"></i> Пароль
+                            </label>
+                            <input type="password" id="employerPassword" placeholder="••••••••">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="employerId">
+                                <i class="fas fa-id-card"></i> ID организации
+                            </label>
+                            <input type="text" id="employerId" placeholder="COMPANY-2025-001">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Шаг 2: Детали заявки -->
+            <div id="detailsStep" class="request-step">
+                <h4>2. Детали заявки</h4>
+                
+                <div class="input-group">
+                    <label for="requestPurpose">
+                        <i class="fas fa-bullseye"></i> Цель запроса
+                    </label>
+                    <select id="requestPurpose">
+                        <option value="hiring">Прием на работу</option>
+                        <option value="contract">Оформление договора</option>
+                        <option value="verification">Проверка данных</option>
+                        <option value="other">Другое</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="requestComment">
+                        <i class="fas fa-comment"></i> Комментарий (необязательно)
+                    </label>
+                    <textarea id="requestComment" rows="3" placeholder="Дополнительная информация о запросе..."></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label>
+                        <i class="fas fa-shield-alt"></i> Уровень доступа
+                    </label>
+                    <div class="radio-group-vertical">
+                        <label>
+                            <input type="radio" name="accessLevel" value="basic" checked>
+                            <span>Базовый (личные данные)</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="accessLevel" value="extended">
+                            <span>Расширенный (+ трудовая история)</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="accessLevel" value="full">
+                            <span>Полный (все данные)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Шаг 3: Подтверждение -->
+            <div id="confirmStep" class="request-step">
+                <h4>3. Подтверждение</h4>
+                
+                <div class="confirmation-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Тип авторизации:</span>
+                        <span id="confirmAuthType" class="detail-value">Сертификат</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">ID организации:</span>
+                        <span id="confirmEmployerId" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Цель запроса:</span>
+                        <span id="confirmPurpose" class="detail-value">Прием на работу</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Уровень доступа:</span>
+                        <span id="confirmAccess" class="detail-value">Базовый</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Будет создано:</span>
+                        <span class="detail-value">
+                            <i class="fas fa-database"></i> .pwid файл<br>
+                            <i class="fas fa-lock"></i> Зашифровано ключом<br>
+                            <i class="fas fa-history"></i> Запись в блокчейне
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="agreement">
+                    <label>
+                        <input type="checkbox" id="dataAgreement" required>
+                        <span>Я подтверждаю, что запрашиваю данные в законных целях и обязуюсь соблюдать законодательство о защите персональных данных</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <div class="step-indicator">
+                <span class="step-dot active" data-step="1"></span>
+                <span class="step-dot" data-step="2"></span>
+                <span class="step-dot" data-step="3"></span>
+            </div>
+            
+            <div class="modal-buttons">
+                <button id="prevStepBtn" class="btn btn-secondary" disabled>
+                    <i class="fas fa-arrow-left"></i> Назад
+                </button>
+                <button id="nextStepBtn" class="btn btn-primary">
+                    Далее <i class="fas fa-arrow-right"></i>
+                </button>
+                <button id="submitRequestBtn" class="btn btn-success" style="display: none;">
+                    <i class="fas fa-paper-plane"></i> Создать заявку
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно: Закрыть заявку -->
+<div id="closeRequestModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-file-import"></i> Закрыть заявку</h3>
+            <button class="close-modal">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="input-group">
+                <label for="requestIdSelect">
+                    <i class="fas fa-list"></i> Выберите заявку
+                </label>
+                <select id="requestIdSelect">
+                    <option value="">-- Выберите ID заявки --</option>
+                    <!-- Заполнится JavaScript -->
+                </select>
+            </div>
+            
+            <div class="request-info" id="selectedRequestInfo" style="display: none;">
+                <h5>Информация о заявке:</h5>
+                <div class="info-grid">
+                    <div><strong>ID:</strong> <span id="infoRequestId">-</span></div>
+                    <div><strong>Дата:</strong> <span id="infoRequestDate">-</span></div>
+                    <div><strong>Статус:</strong> <span id="infoRequestStatus">-</span></div>
+                    <div><strong>Цель:</strong> <span id="infoRequestPurpose">-</span></div>
+                </div>
+            </div>
+            
+            <div class="action-tabs">
+                <button class="action-tab active" data-action="update">
+                    <i class="fas fa-sync-alt"></i> Обновить данные
+                </button>
+                <button class="action-tab" data-action="reject">
+                    <i class="fas fa-times-circle"></i> Отказ
+                </button>
+            </div>
+            
+            <!-- Обновление данных -->
+            <div id="updateAction" class="action-content active">
+                <div class="input-group">
+                    <label for="updatePwidFile">
+                        <i class="fas fa-file-upload"></i> Загрузите обновленный .pwid файл
+                    </label>
+                    <input type="file" id="updatePwidFile" accept=".pwid,.sqlite,.db">
+                    <small class="help-text">Файл с обновленными данными сотрудника</small>
+                </div>
+                
+                <div class="input-group">
+                    <label for="updateComment">
+                        <i class="fas fa-edit"></i> Комментарий к обновлению
+                    </label>
+                    <textarea id="updateComment" rows="2" placeholder="Что было обновлено..."></textarea>
+                </div>
+            </div>
+            
+            <!-- Отказ -->
+            <div id="rejectAction" class="action-content">
+                <div class="input-group">
+                    <label for="rejectReason">
+                        <i class="fas fa-exclamation-triangle"></i> Причина отказа
+                    </label>
+                    <select id="rejectReason">
+                        <option value="candidate_rejected">Кандидат не подошел</option>
+                        <option value="position_closed">Вакансия закрыта</option>
+                        <option value="data_insufficient">Недостаточно данных</option>
+                        <option value="other">Другая причина</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="rejectDetails">
+                        <i class="fas fa-comment-dots"></i> Подробности (необязательно)
+                    </label>
+                    <textarea id="rejectDetails" rows="3" placeholder="Дополнительная информация..."></textarea>
+                </div>
+            </div>
+            
+            <!-- Шифрование для центра -->
+            <div class="encryption-section">
+                <div class="input-group">
+                    <label for="centerCertificate">
+                        <i class="fas fa-key"></i> Сертификат центра для шифрования
+                    </label>
+                    <input type="file" id="centerCertificate" accept=".pem,.cer">
+                    <small class="help-text">Публичный ключ центра DOCScoin для шифрования ответа</small>
+                </div>
+                
+                <div class="certificate-note">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Ответ будет зашифрован этим ключом и отправлен в центр</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button id="closeRequestBtn" class="btn btn-success btn-large">
+                <i class="fas fa-check-circle"></i> Отправить ответ
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно: Успех -->
+<div id="successModal" class="modal">
+    <div class="modal-content success-modal">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h3>Заявка успешно создана!</h3>
+        
+        <div class="success-details">
+            <div class="success-item">
+                <i class="fas fa-hashtag"></i>
+                <div>
+                    <strong>ID заявки:</strong>
+                    <span id="successRequestId">REQ-2025-001</span>
+                </div>
+            </div>
+            <div class="success-item">
+                <i class="fas fa-file-download"></i>
+                <div>
+                    <strong>Файл готов:</strong>
+                    <a href="#" id="successDownloadLink" class="download-link">
+                        Скачать .pwid файл
+                    </a>
+                </div>
+            </div>
+            <div class="success-item">
+                <i class="fas fa-link"></i>
+                <div>
+                    <strong>Ссылка для закрытия:</strong>
+                    <span class="copy-link" id="successCloseLink">
+                        https://docscoin.org/close/REQ-2025-001
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="success-actions">
+            <button class="btn btn-primary" id="viewBlockchainBtn">
+                <i class="fas fa-link"></i> Посмотреть в блокчейне
+            </button>
+            <button class="btn btn-secondary close-modal">
+                <i class="fas fa-times"></i> Закрыть
+            </button>
+        </div>
+    </div>
+</div>
 </body>
 </html>

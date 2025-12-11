@@ -573,29 +573,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updatePreview() {
-        function updatePreview() {
-		// Безопасное получение значений из полей
-		const safeGetValue = (id, defaultValue = '') => {
-			const element = document.getElementById(id);
-			return element ? element.value || defaultValue : defaultValue;
-		};
-		
-		// Обновляем sampleData безопасно
-		sampleData.employeeName = safeGetValue('employeeName', sampleData.employeeName);
-		sampleData.passportSeries = safeGetValue('ruPassportSeries', sampleData.passportSeries);
-		sampleData.passportNumber = safeGetValue('ruPassportNumber', sampleData.passportNumber);
-		sampleData.inn = safeGetValue('ruINN', sampleData.inn);
-		sampleData.position = safeGetValue('position', sampleData.position);
-		sampleData.salary = safeGetValue('salary', sampleData.salary);
-		sampleData.currency = safeGetValue('currency', sampleData.currency);
-		sampleData.employeeId = safeGetValue('employeeId', sampleData.employeeId);
-		sampleData.department = safeGetValue('department', sampleData.department);
-		
-		// Обновляем GUID если поле существует
-		const globalIdField = document.getElementById('globalId');
-		if (globalIdField && !globalIdField.value) {
-			globalIdField.value = generateUUID();
-		}
+        // Безопасное получение значений из полей
+        const safeGetValue = (id, defaultValue = '') => {
+            const element = document.getElementById(id);
+            return element ? element.value || defaultValue : defaultValue;
+        };
+        
+        // Обновляем sampleData безопасно
+        sampleData.employeeName = safeGetValue('employeeName', sampleData.employeeName);
+        sampleData.passportSeries = safeGetValue('ruPassportSeries', sampleData.passportSeries);
+        sampleData.passportNumber = safeGetValue('ruPassportNumber', sampleData.passportNumber);
+        sampleData.inn = safeGetValue('ruINN', sampleData.inn);
+        sampleData.position = safeGetValue('position', sampleData.position);
+        sampleData.salary = safeGetValue('salary', sampleData.salary);
+        sampleData.currency = safeGetValue('currency', sampleData.currency);
+        sampleData.employeeId = safeGetValue('employeeId', sampleData.employeeId);
+        sampleData.department = safeGetValue('department', sampleData.department);
+        
+        // Обновляем GUID если поле существует
+        const globalIdField = document.getElementById('globalId');
+        if (globalIdField && !globalIdField.value) {
+            globalIdField.value = generateUUID();
+        }
         
         // Update all placeholders in the document
         const placeholders = documentPreview.querySelectorAll('.placeholder');
@@ -929,4 +928,855 @@ Generated,${new Date().toISOString()}
             statusMessage.style.display = 'none';
         }, 5000);
     }
+	
+	// ============================================
+// РАБОТА С ЗАЯВКАМИ
+// ============================================
+
+// Хранилище заявок (в реальности на бэкенде)
+let requestsDB = {
+    nextId: 1,
+    requests: [],
+    loadFromStorage() {
+        const saved = localStorage.getItem('docscoin_requests');
+        if (saved) {
+            const data = JSON.parse(saved);
+            this.nextId = data.nextId || 1;
+            this.requests = data.requests || [];
+        }
+    },
+    saveToStorage() {
+        localStorage.setItem('docscoin_requests', JSON.stringify({
+            nextId: this.nextId,
+            requests: this.requests
+        }));
+    },
+    createRequest(data) {
+        const request = {
+            id: `REQ-${new Date().getFullYear()}-${String(this.nextId).padStart(3, '0')}`,
+            ...data,
+            created: new Date().toISOString(),
+            status: 'pending',
+            blockchain_tx: null,
+            files: [],
+            updates: []
+        };
+        
+        this.requests.push(request);
+        this.nextId++;
+        this.saveToStorage();
+        
+        return request;
+    },
+    getRequest(id) {
+        return this.requests.find(r => r.id === id);
+    },
+    updateRequest(id, updates) {
+        const index = this.requests.findIndex(r => r.id === id);
+        if (index !== -1) {
+            this.requests[index] = { ...this.requests[index], ...updates };
+            this.saveToStorage();
+            return this.requests[index];
+        }
+        return null;
+    },
+    getMyRequests(employerId) {
+        return this.requests.filter(r => r.employer_id === employerId);
+    }
+};
+
+// Инициализация
+requestsDB.loadFromStorage();
+
+// DOM элементы для модальных окон
+let currentStep = 1;
+let currentRequestData = {};
+
+// Инициализация модальных окон
+function initRequestModals() {
+    // Кнопки открытия
+    const exportPwidBtn = document.getElementById('generatePwid');
+    const closeRequestBtn = document.getElementById('closeRequestBtnGlobal'); // Добавьте эту кнопку в HTML
+    
+    // Модальные окна
+    const createModal = document.getElementById('createRequestModal');
+    const closeModal = document.getElementById('closeRequestModal');
+    const successModal = document.getElementById('successModal');
+    
+    // Кнопки закрытия
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+            resetRequestForm();
+        });
+    });
+    
+    // Клик вне модального окна
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
+            resetRequestForm();
+        }
+    });
+    
+    // Кнопка "Export as .pwid" (добавьте её в generation-buttons)
+    if (exportPwidBtn) {
+        exportPwidBtn.addEventListener('click', () => {
+            createModal.style.display = 'block';
+            initRequestForm();
+        });
+    }
+    
+    // Кнопка "Close Request" (добавьте отдельную кнопку)
+    if (closeRequestBtn) {
+        closeRequestBtn.addEventListener('click', () => {
+            closeModal.style.display = 'block';
+            loadMyRequests();
+        });
+    }
+    
+    // Табы авторизации
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabName = tab.getAttribute('data-tab');
+            switchAuthTab(tabName);
+        });
+    });
+    
+    // Табы действий
+    document.querySelectorAll('.action-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const action = tab.getAttribute('data-action');
+            switchActionTab(action);
+        });
+    });
+    
+    // Навигация по шагам
+    document.getElementById('nextStepBtn').addEventListener('click', goToNextStep);
+    document.getElementById('prevStepBtn').addEventListener('click', goToPrevStep);
+    document.getElementById('submitRequestBtn').addEventListener('click', submitRequest);
+    document.getElementById('closeRequestBtn').addEventListener('click', submitCloseRequest);
+    
+    // Загрузка сертификата
+    document.getElementById('certificateFile').addEventListener('change', handleCertificateUpload);
+    
+    // Выбор заявки
+    document.getElementById('requestIdSelect').addEventListener('change', handleRequestSelect);
+}
+
+// Переключение табов авторизации
+function switchAuthTab(tabName) {
+    // Обновляем активный таб
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.getAttribute('data-tab') === tabName) {
+            tab.classList.add('active');
+        }
+    });
+    
+    // Показываем нужный контент
+    document.querySelectorAll('.auth-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.getElementById(`${tabName}Auth`).classList.add('active');
+    
+    // Сохраняем тип авторизации
+    currentRequestData.auth_type = tabName;
+}
+
+// Переключение табов действий
+function switchActionTab(action) {
+    document.querySelectorAll('.action-tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.getAttribute('data-action') === action) {
+            tab.classList.add('active');
+        }
+    });
+    
+    document.querySelectorAll('.action-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.getElementById(`${action}Action`).classList.add('active');
+}
+
+// Навигация по шагам
+function goToNextStep() {
+    if (validateCurrentStep()) {
+        currentStep++;
+        updateRequestForm();
+    }
+}
+
+function goToPrevStep() {
+    if (currentStep > 1) {
+        currentStep--;
+        updateRequestForm();
+    }
+}
+
+// Обновление формы заявки
+function updateRequestForm() {
+    // Скрываем все шаги
+    document.querySelectorAll('.request-step').forEach(step => {
+        step.classList.remove('active');
+    });
+    
+    // Показываем текущий шаг
+    document.getElementById(`${['auth', 'details', 'confirm'][currentStep-1]}Step`).classList.add('active');
+    
+    // Обновляем индикаторы
+    document.querySelectorAll('.step-dot').forEach((dot, index) => {
+        if (index + 1 === currentStep) {
+            dot.classList.add('active');
+        } else {
+            dot.classList.remove('active');
+        }
+    });
+    
+    // Обновляем кнопки
+    const prevBtn = document.getElementById('prevStepBtn');
+    const nextBtn = document.getElementById('nextStepBtn');
+    const submitBtn = document.getElementById('submitRequestBtn');
+    
+    prevBtn.disabled = currentStep === 1;
+    
+    if (currentStep === 3) {
+        nextBtn.style.display = 'none';
+        submitBtn.style.display = 'block';
+        updateConfirmationDetails();
+    } else {
+        nextBtn.style.display = 'block';
+        submitBtn.style.display = 'none';
+    }
+}
+
+// Обновление деталей подтверждения
+function updateConfirmationDetails() {
+    document.getElementById('confirmAuthType').textContent = 
+        currentRequestData.auth_type === 'certificate' ? 'Сертификат' : 'Логин/Пароль';
+    
+    document.getElementById('confirmEmployerId').textContent = 
+        currentRequestData.employer_id || '-';
+    
+    const purposeSelect = document.getElementById('requestPurpose');
+    document.getElementById('confirmPurpose').textContent = 
+        purposeSelect.options[purposeSelect.selectedIndex].text;
+    
+    const accessRadio = document.querySelector('input[name="accessLevel"]:checked');
+    document.getElementById('confirmAccess').textContent = 
+        accessRadio ? accessRadio.nextElementSibling.textContent : 'Базовый';
+}
+
+// Валидация шага
+function validateCurrentStep() {
+    if (currentStep === 1) {
+        // Валидация авторизации
+        if (currentRequestData.auth_type === 'certificate') {
+            const certFile = document.getElementById('certificateFile');
+            if (!certFile.files.length) {
+                alert('Пожалуйста, загрузите сертификат');
+                return false;
+            }
+        } else {
+            const login = document.getElementById('employerLogin').value;
+            const password = document.getElementById('employerPassword').value;
+            const employerId = document.getElementById('employerId').value;
+            
+            if (!login || !password || !employerId) {
+                alert('Пожалуйста, заполните все поля');
+                return false;
+            }
+            
+            currentRequestData.employer_login = login;
+            currentRequestData.employer_id = employerId;
+        }
+    } else if (currentStep === 2) {
+        // Валидация деталей
+        const purpose = document.getElementById('requestPurpose').value;
+        if (!purpose) {
+            alert('Пожалуйста, укажите цель запроса');
+            return false;
+        }
+        
+        currentRequestData.purpose = purpose;
+        currentRequestData.access_level = document.querySelector('input[name="accessLevel"]:checked').value;
+        currentRequestData.comment = document.getElementById('requestComment').value;
+    } else if (currentStep === 3) {
+        // Валидация соглашения
+        if (!document.getElementById('dataAgreement').checked) {
+            alert('Пожалуйста, подтвердите соглашение');
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+// Обработка загрузки сертификата
+function handleCertificateUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const content = e.target.result;
+        
+        // Парсим PEM сертификат (упрощенно)
+        const certInfo = parseCertificateInfo(content);
+        
+        // Показываем информацию
+        const preview = document.getElementById('certificatePreview');
+        const infoEl = document.getElementById('certificateInfo');
+        
+        infoEl.textContent = JSON.stringify(certInfo, null, 2);
+        preview.style.display = 'block';
+        
+		// Сохраняем сертификат
+		currentRequestData.certificate = content;
+		currentRequestData.employer_id = certInfo.commonName || 
+			certInfo.organization || 'UNKNOWN_ORG';
+		};
+
+		reader.readAsText(file);
+		}
+
+		// Упрощенный парсинг сертификата
+		function parseCertificateInfo(pemContent) {
+		// В реальном приложении используйте библиотеку типа pkijs или asn1js
+		try {
+		// Базовый парсинг PEM
+		const base64 = pemContent
+			.replace(/-----BEGIN CERTIFICATE-----/, '')
+			.replace(/-----END CERTIFICATE-----/, '')
+			.replace(/\s+/g, '');
+			
+		const decoded = atob(base64);
+			
+		// Пытаемся найти данные в DER (упрощенно)
+		return {
+			format: 'X.509 PEM',
+			size: `${pemContent.length} chars`,
+			commonName: extractCN(pemContent),
+			organization: extractO(pemContent),
+			validFrom: new Date().toLocaleDateString(),
+			validTo: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toLocaleDateString()
+		};
+		} catch (e) {
+		return {
+			error: 'Не удалось прочитать сертификат',
+			details: e.message
+		};
+		}
+		}
+
+		function extractCN(pem) {
+		const match = pem.match(/CN=([^,\n]+)/);
+		return match ? match[1] : 'Не указан';
+		}
+
+		function extractO(pem) {
+		const match = pem.match(/O=([^,\n]+)/);
+		return match ? match[1] : 'Не указана';
+		}
+
+		// Отправка заявки
+		async function submitRequest() {
+		if (!validateCurrentStep()) return;
+
+		// Блокируем кнопку на время обработки
+		const submitBtn = document.getElementById('submitRequestBtn');
+		submitBtn.disabled = true;
+		submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Создание...';
+
+		try {
+		// 1. Получаем данные из формы
+		const formData = {
+			...currentRequestData,
+			personal_data: getPersonalDataForRequest(),
+			timestamp: new Date().toISOString(),
+			request_id: `REQ-${Date.now()}`
+		};
+
+		// 2. Генерируем .pwid файл с шифрованием
+		const pwidData = await generateEncryptedPwid(formData);
+
+		// 3. Создаем запись о заявке
+		const request = requestsDB.createRequest({
+			...formData,
+			pwid_hash: await hashData(pwidData),
+			status: 'created'
+		});
+
+		// 4. Симулируем отправку в блокчейн (в реальности API вызов)
+		const txHash = await simulateBlockchainSubmit(request);
+
+		// 5. Показываем успешное окно
+		showSuccessModal(request, pwidData, txHash);
+
+		// 6. Сбрасываем форму
+		resetRequestForm();
+
+		} catch (error) {
+		console.error('Ошибка создания заявки:', error);
+		alert(`Ошибка: ${error.message}`);
+		} finally {
+		submitBtn.disabled = false;
+		submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Создать заявку';
+		}
+		}
+
+		// Получение персональных данных из формы
+		function getPersonalDataForRequest() {
+		const accessLevel = currentRequestData.access_level || 'basic';
+		const data = {};
+
+		// Базовые данные (всегда)
+		data.basic = {
+			full_name: document.getElementById('fullName').value,
+			birth_date: document.getElementById('birthDate').value,
+			passport: document.getElementById('passport').value,
+			phone: document.getElementById('phone').value,
+			email: document.getElementById('email').value
+		};
+
+		// Расширенные данные (если выбрано)
+		if (accessLevel === 'extended' || accessLevel === 'full') {
+			data.extended = {
+				education: getEducationData(),
+				work_history: getWorkHistory(),
+				skills: getSkillsData()
+			};
+		}
+
+		// Полные данные
+		if (accessLevel === 'full') {
+			data.full = {
+				certificates: getCertificates(),
+				languages: getLanguages(),
+				additional_info: document.getElementById('additionalInfo').value
+			};
+		}
+
+		return data;
+		}
+
+		// Генерация зашифрованного .pwid
+		async function generateEncryptedPwid(formData) {
+		// 1. Преобразуем данные в бинарный формат
+		const jsonData = JSON.stringify(formData, null, 2);
+		const encoder = new TextEncoder();
+		const dataBuffer = encoder.encode(jsonData);
+
+		// 2. Генерируем ключ шифрования
+		const cryptoKey = await generateEncryptionKey(formData);
+
+		// 3. Шифруем данные
+		let encryptedData;
+		if (currentRequestData.auth_type === 'certificate' && currentRequestData.certificate) {
+			// Шифрование публичным ключом сертификата (симуляция)
+			encryptedData = await simulateCertificateEncryption(dataBuffer, currentRequestData.certificate);
+		} else {
+			// Шифрование симметричным ключом (для демо)
+			encryptedData = await symmetricEncrypt(dataBuffer, cryptoKey);
+		}
+
+		// 4. Создаем структуру .pwid файла
+		const pwidStructure = {
+			version: '1.0',
+			format: 'DOCScoin Personal Data',
+			timestamp: new Date().toISOString(),
+			request_id: formData.request_id,
+			employer_id: formData.employer_id,
+			data_encrypted: true,
+			encryption_method: currentRequestData.auth_type === 'certificate' ? 'RSA-OAEP' : 'AES-GCM',
+			data: btoa(String.fromCharCode(...new Uint8Array(encryptedData))), // Base64
+			signature: await generateSignature(encryptedData, formData.request_id),
+			metadata: {
+				access_level: formData.access_level,
+				purpose: formData.purpose,
+				created_by: 'DOCScoin Generator'
+			}
+		};
+
+		return JSON.stringify(pwidStructure, null, 2);
+		}
+
+		// Вспомогательные функции шифрования (симуляция)
+		async function generateEncryptionKey(formData) {
+		// В реальном приложении используйте Web Crypto API
+		return window.crypto.subtle.generateKey(
+			{
+				name: "AES-GCM",
+				length: 256,
+			},
+			true,
+			["encrypt", "decrypt"]
+		);
+		}
+
+		async function simulateCertificateEncryption(data, certificate) {
+		// Симуляция RSA шифрования
+		// В реальности нужно использовать Web Crypto API с импортом сертификата
+		return new Uint8Array(data);
+		}
+
+		async function symmetricEncrypt(data, key) {
+		const iv = window.crypto.getRandomValues(new Uint8Array(12));
+		const encrypted = await window.crypto.subtle.encrypt(
+			{
+				name: "AES-GCM",
+				iv: iv
+			},
+			key,
+			data
+		);
+
+		// Объединяем IV и зашифрованные данные
+		const result = new Uint8Array(iv.length + encrypted.byteLength);
+		result.set(iv);
+		result.set(new Uint8Array(encrypted), iv.length);
+
+		return result;
+		}
+
+		async function generateSignature(data, requestId) {
+		// Генерация подписи для верификации
+		const key = await window.crypto.subtle.generateKey(
+			{ name: "HMAC", hash: "SHA-256" },
+			true,
+			["sign", "verify"]
+		);
+
+		const signature = await window.crypto.subtle.sign(
+			"HMAC",
+			key,
+			data
+		);
+
+		return btoa(String.fromCharCode(...new Uint8Array(signature)));
+		}
+
+		async function hashData(data) {
+		const encoder = new TextEncoder();
+		const hashBuffer = await window.crypto.subtle.digest(
+			'SHA-256',
+			encoder.encode(data)
+		);
+		const hashArray = Array.from(new Uint8Array(hashBuffer));
+		return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+		}
+
+		async function simulateBlockchainSubmit(request) {
+		// Симуляция отправки в блокчейн
+		// В реальности: вызов смарт-контракта или API ноды
+		return new Promise(resolve => {
+			setTimeout(() => {
+				const txHash = '0x' + Array.from(
+					{length: 64}, 
+					() => Math.floor(Math.random() * 16).toString(16)
+				).join('');
+				
+				// Обновляем запись в базе
+				requestsDB.updateRequest(request.id, {
+					blockchain_tx: txHash,
+					status: 'submitted'
+				});
+				
+				resolve(txHash);
+			}, 1500);
+		});
+		}
+
+		// Показ окна успеха
+		function showSuccessModal(request, pwidData, txHash) {
+		// Заполняем данные
+		document.getElementById('successRequestId').textContent = request.id;
+		document.getElementById('successCloseLink').textContent = 
+			`${window.location.origin}/close/${request.id}`;
+
+		// Создаем ссылку для скачивания
+		const blob = new Blob([pwidData], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+		const downloadLink = document.getElementById('successDownloadLink');
+		downloadLink.href = url;
+		downloadLink.download = `${request.id}.pwid`;
+
+		// Настраиваем кнопку просмотра в блокчейне
+		document.getElementById('viewBlockchainBtn').onclick = () => {
+			window.open(`https://testnet.docscoin.org/tx/${txHash}`, '_blank');
+		};
+
+		// Показываем модальное окно
+		document.getElementById('createRequestModal').style.display = 'none';
+		document.getElementById('successModal').style.display = 'block';
+		}
+
+		// ЗАКРЫТИЕ ЗАЯВКИ
+
+		// Загрузка моих заявок
+		function loadMyRequests() {
+		const select = document.getElementById('requestIdSelect');
+		select.innerHTML = '<option value="">-- Выберите ID заявки --</option>';
+
+		// В реальности: загрузка по employer_id
+		const myRequests = requestsDB.requests.filter(r => 
+			r.status === 'submitted' || r.status === 'pending'
+		);
+
+		myRequests.forEach(request => {
+			const option = document.createElement('option');
+			option.value = request.id;
+			option.textContent = `${request.id} - ${request.purpose} (${new Date(request.created).toLocaleDateString()})`;
+			select.appendChild(option);
+		});
+		}
+
+		// Выбор заявки
+		function handleRequestSelect(event) {
+		const requestId = event.target.value;
+		const infoEl = document.getElementById('selectedRequestInfo');
+
+		if (!requestId) {
+			infoEl.style.display = 'none';
+			return;
+		}
+
+		const request = requestsDB.getRequest(requestId);
+		if (request) {
+			document.getElementById('infoRequestId').textContent = request.id;
+			document.getElementById('infoRequestDate').textContent = 
+				new Date(request.created).toLocaleString();
+			document.getElementById('infoRequestStatus').textContent = 
+				getStatusText(request.status);
+			document.getElementById('infoRequestPurpose').textContent = request.purpose;
+			
+			infoEl.style.display = 'block';
+		} else {
+			infoEl.style.display = 'none';
+		}
+		}
+
+		function getStatusText(status) {
+		const statusMap = {
+			'pending': '⏳ Ожидает',
+			'submitted': '✅ Отправлена',
+			'closed': '🔒 Закрыта',
+			'rejected': '❌ Отказ'
+		};
+		return statusMap[status] || status;
+		}
+
+		// Отправка закрытия заявки
+		async function submitCloseRequest() {
+		const requestId = document.getElementById('requestIdSelect').value;
+		const action = document.querySelector('.action-tab.active').getAttribute('data-action');
+		const centerCert = document.getElementById('centerCertificate').files[0];
+
+		if (!requestId) {
+			alert('Выберите заявку');
+			return;
+		}
+
+		if (!centerCert) {
+			alert('Загрузите сертификат центра');
+			return;
+		}
+
+		const request = requestsDB.getRequest(requestId);
+		if (!request) {
+			alert('Заявка не найдена');
+			return;
+		}
+
+		// Блокируем кнопку
+		const submitBtn = document.getElementById('closeRequestBtn');
+		submitBtn.disabled = true;
+		submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
+
+		try {
+			let responseData;
+			
+			if (action === 'update') {
+				// Обновление данных
+				const pwidFile = document.getElementById('updatePwidFile').files[0];
+				if (!pwidFile) {
+					alert('Загрузите обновленный .pwid файл');
+					return;
+				}
+				
+				responseData = await createUpdateResponse(request, pwidFile);
+			} else {
+				// Отказ
+				const reason = document.getElementById('rejectReason').value;
+				const details = document.getElementById('rejectDetails').value;
+				
+				responseData = await createRejectionResponse(request, reason, details);
+			}
+			
+			// Шифруем ответ сертификатом центра
+			const encryptedResponse = await encryptForCenter(responseData, await readFileAsText(centerCert));
+			
+			// Обновляем статус заявки
+			requestsDB.updateRequest(requestId, {
+				status: action === 'update' ? 'closed' : 'rejected',
+				closed_at: new Date().toISOString(),
+				close_action: action,
+				close_data: responseData
+			});
+			
+			// Симулируем отправку в блокчейн
+			await simulateBlockchainClose(requestId, action);
+			
+			// Показываем успех
+			alert(`Заявка ${requestId} успешно закрыта!`);
+			document.getElementById('closeRequestModal').style.display = 'none';
+			
+		} catch (error) {
+			console.error('Ошибка закрытия заявки:', error);
+			alert(`Ошибка: ${error.message}`);
+		} finally {
+			submitBtn.disabled = false;
+			submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Отправить ответ';
+		}
+		}
+
+		async function createUpdateResponse(request, pwidFile) {
+		// Читаем обновленный файл
+		const fileContent = await readFileAsText(pwidFile);
+			
+		return {
+			type: 'update',
+			request_id: request.id,
+			original_pwid_hash: request.pwid_hash,
+			new_pwid_hash: await hashData(fileContent),
+			timestamp: new Date().toISOString(),
+			comment: document.getElementById('updateComment').value,
+			data_preview: await extractPreviewData(fileContent)
+		};
+		}
+
+		async function createRejectionResponse(request, reason, details) {
+		return {
+			type: 'rejection',
+			request_id: request.id,
+			reason: reason,
+			details: details,
+			timestamp: new Date().toISOString(),
+			employer_id: request.employer_id,
+			candidate_data: {
+				name: request.personal_data?.basic?.full_name || 'Не указано',
+				// Можно добавить другую информацию (без персональных данных)
+			}
+		};
+		}
+
+		async function encryptForCenter(data, certificate) {
+		// Шифрование публичным ключом центра
+		const encoder = new TextEncoder();
+		const dataBuffer = encoder.encode(JSON.stringify(data));
+			
+		// В реальности используйте сертификат центра для RSA шифрования
+		return btoa(String.fromCharCode(...new Uint8Array(dataBuffer)));
+		}
+
+		async function extractPreviewData(pwidContent) {
+		try {
+			const data = JSON.parse(pwidContent);
+			return {
+				metadata: data.metadata,
+				data_encrypted: data.data_encrypted,
+				timestamp: data.timestamp
+			};
+		} catch {
+			return { error: 'Не удалось прочитать файл' };
+		}
+		}
+
+		function readFileAsText(file) {
+		return new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = e => resolve(e.target.result);
+			reader.onerror = reject;
+			reader.readAsText(file);
+		});
+		}
+
+		async function simulateBlockchainClose(requestId, action) {
+		// Симуляция записи в блокчейн
+		return new Promise(resolve => {
+			setTimeout(() => {
+				console.log(`Заявка ${requestId} закрыта в блокчейне (${action})`);
+				resolve();
+			}, 1000);
+		});
+		}
+
+		// Сброс формы заявки
+		function resetRequestForm() {
+		currentStep = 1;
+		currentRequestData = {};
+			
+		// Сбрасываем UI
+		document.querySelectorAll('.request-step').forEach((step, index) => {
+			step.classList.remove('active');
+			if (index === 0) step.classList.add('active');
+		});
+			
+		document.querySelectorAll('.step-dot').forEach((dot, index) => {
+			dot.classList.toggle('active', index === 0);
+		});
+			
+		// Сбрасываем форму
+		document.getElementById('certificateFile').value = '';
+		document.getElementById('employerLogin').value = '';
+		document.getElementById('employerPassword').value = '';
+		document.getElementById('employerId').value = '';
+		document.getElementById('requestPurpose').selectedIndex = 0;
+		document.getElementById('requestComment').value = '';
+		document.querySelector('input[name="accessLevel"][value="basic"]').checked = true;
+		document.getElementById('dataAgreement').checked = false;
+		document.getElementById('certificatePreview').style.display = 'none';
+			
+		// Сбрасываем кнопки
+		document.getElementById('prevStepBtn').disabled = true;
+		document.getElementById('nextStepBtn').style.display = 'block';
+		document.getElementById('submitRequestBtn').style.display = 'none';
+		}
+
+		// Инициализация формы
+		function initRequestForm() {
+		resetRequestForm();
+		switchAuthTab('certificate');
+		switchActionTab('update');
+		}
+
+		// Инициализация при загрузке
+		document.addEventListener('DOMContentLoaded', () => {
+		initRequestModals();
+			
+		// Добавляем кнопки заявок в основной интерфейс
+		addRequestButtonsToUI();
+		});
+
+		// Добавление кнопок заявок в UI
+		function addRequestButtonsToUI() {
+			const buttonContainer = document.querySelector('.generator-actions');
+			if (!buttonContainer) return;
+				
+			const requestButtons = document.createElement('div');
+			requestButtons.className = 'request-buttons';
+			requestButtons.innerHTML = `
+				<button id="generatePwid" class="request-btn">
+					<i class="fas fa-file-export"></i> Export as .pwid (с заявкой)
+				</button>
+				<button id="closeRequestBtnGlobal" class="request-btn secondary">
+					<i class="fas fa-file-import"></i> Закрыть заявку
+				</button>
+			`;
+				
+			buttonContainer.appendChild(requestButtons);
+		}
 });
+
